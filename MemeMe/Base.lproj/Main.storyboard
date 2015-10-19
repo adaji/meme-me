@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--Meme Editor View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="MemeEditorViewController" customModule="MemeMe" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8l5-Lu-QpT">
+                                <rect key="frame" x="0.0" y="44" width="600" height="512"/>
+                            </imageView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ywu-Vv-Mag">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="7kc-k3-Njn"/>
+                                </constraints>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="R0i-m9-xB0"/>
+                                    <barButtonItem systemItem="camera" id="slV-qx-u9K">
+                                        <connections>
+                                            <action selector="takeAnImage:" destination="BYZ-38-t0r" id="Ijg-O0-AA7"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem title="Album" id="SNA-xp-EVR">
+                                        <connections>
+                                            <action selector="pickAnImageFromAlbum:" destination="BYZ-38-t0r" id="LQd-3C-BdP"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="9Rc-IZ-Nob"/>
+                                </items>
+                            </toolbar>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="TOP" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
+                                <rect key="frame" x="20" y="74" width="560" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="jxG-dW-UeD"/>
+                                </constraints>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters"/>
+                            </textField>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XZs-0F-fbI">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="GXS-bJ-NSS"/>
+                                </constraints>
+                                <items>
+                                    <barButtonItem enabled="NO" systemItem="action" id="Tpe-Hp-aV9"/>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="AAa-cd-Xhx"/>
+                                    <barButtonItem enabled="NO" systemItem="cancel" id="mkR-4W-fCE"/>
+                                </items>
+                            </toolbar>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="BOTTOM" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="pY0-ZR-Tni">
+                                <rect key="frame" x="20" y="476" width="560" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="sqH-qL-yQQ"/>
+                                </constraints>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters"/>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Jlg-Hq-ME1" firstAttribute="top" secondItem="XZs-0F-fbI" secondAttribute="bottom" constant="30" id="2oP-V1-4zt"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="8l5-Lu-QpT" secondAttribute="bottom" constant="44" id="5YX-8m-8Mo"/>
+                            <constraint firstItem="Jlg-Hq-ME1" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="7ey-ty-nwW"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="XZs-0F-fbI" secondAttribute="trailing" constant="-20" id="8WF-SS-stL"/>
+                            <constraint firstItem="8l5-Lu-QpT" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="8nM-A0-HSb"/>
+                            <constraint firstItem="8l5-Lu-QpT" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" constant="44" id="9Fm-cv-BLg"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Ywu-Vv-Mag" secondAttribute="trailing" constant="-20" id="AUB-ZR-7hx"/>
+                            <constraint firstItem="Ywu-Vv-Mag" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="CR1-iA-eTA"/>
+                            <constraint firstItem="pY0-ZR-Tni" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="EEc-7z-vTA"/>
+                            <constraint firstItem="pY0-ZR-Tni" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="EsJ-op-QHH"/>
+                            <constraint firstItem="Jlg-Hq-ME1" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="IF2-jZ-lho"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Ywu-Vv-Mag" secondAttribute="bottom" id="TtR-XQ-kJj"/>
+                            <constraint firstItem="XZs-0F-fbI" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="gUa-i9-NI1"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="8l5-Lu-QpT" secondAttribute="trailing" constant="-20" id="nv4-4q-e8t"/>
+                            <constraint firstItem="XZs-0F-fbI" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="qrQ-wr-bvb"/>
+                            <constraint firstItem="Ywu-Vv-Mag" firstAttribute="top" secondItem="pY0-ZR-Tni" secondAttribute="bottom" constant="30" id="r8h-mm-2IB"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="bottomBar" destination="Ywu-Vv-Mag" id="6pZ-s1-Tgy"/>
+                        <outlet property="bottomTextField" destination="pY0-ZR-Tni" id="6nc-rv-6dg"/>
+                        <outlet property="cameraButton" destination="slV-qx-u9K" id="qc7-uY-JOV"/>
+                        <outlet property="imageView" destination="8l5-Lu-QpT" id="oi9-uQ-DbH"/>
+                        <outlet property="topBar" destination="XZs-0F-fbI" id="5zE-3B-pcq"/>
+                        <outlet property="topTextField" destination="Jlg-Hq-ME1" id="KrZ-nX-AlC"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="280" y="344"/>
+        </scene>
+    </scenes>
+</document>
