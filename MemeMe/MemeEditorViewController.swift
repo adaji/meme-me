@@ -31,11 +31,8 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fontNames = ["Impact", "Legrand", "Cowboy Movie", "KBABCDoodles"]
-        currentFontIndex = 0
-        
-        textColors = [UIColor.whiteColor(), UIColor.redColor(), UIColor.blackColor()]
-        currentColorIndex = 0
+        fontNames = ["Impact", "Legrand", "Cowboy Movie"]
+        textColors = [UIColor.whiteColor(), UIColor.redColor(), UIColor.blueColor(), UIColor.blackColor()]
         
         setupEditorView()
     }
@@ -45,8 +42,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         bottomTextField.delegate = self
         
         // Set default text and text attributes
-        setTextToDefault()
-        setTextAttributes(fontNames[0] as! String, textColor: textColors[0] as! UIColor)
+        setTextFieldsToDefault()
         
         // Swipe right or left to change font
         let leftSwipe = UISwipeGestureRecognizer(target: self, action: "changeFont:")
@@ -64,6 +60,40 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         swipeDown.direction = .Down
         self.view.addGestureRecognizer(swipeDown)
     }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
+        
+        // Subscribe to the keyboard notifications, to allow the view to adjust frame when necessary
+        subscribeToKeyboardNotifications()
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        unsubscribeToKeyboardNotifications()
+    }
+    
+    // MARK: Edit meme image
+    
+    @IBAction func pickImageFromAlbum(sender: UIBarButtonItem) {
+        presentImagePicker(UIImagePickerControllerSourceType.PhotoLibrary)
+    }
+    
+    @IBAction func takeImage(sender: UIBarButtonItem) {
+        presentImagePicker(UIImagePickerControllerSourceType.Camera)
+    }
+    
+    func presentImagePicker(sourceType: UIImagePickerControllerSourceType) {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = sourceType
+        self.presentViewController(imagePicker, animated: true, completion: nil)
+    }
+    
+    // MARK: Swipe to change font or text color
     
     func changeFont(sender: UISwipeGestureRecognizer) {
         if (sender.direction == .Left) {
@@ -85,61 +115,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         setTextAttributes(fontNames[currentFontIndex] as! String, textColor: textColors[currentColorIndex] as! UIColor)
     }
     
-    func setTextAttributes(fontName: String, textColor: UIColor) {
-        // Set default text attributes
-        let memeTextAttributes = [
-            NSStrokeColorAttributeName : UIColor.blackColor(),
-            NSForegroundColorAttributeName : textColor,
-            NSFontAttributeName : UIFont(name: fontName, size: 40)!,
-            NSStrokeWidthAttributeName : -3 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
-        ]
-        topTextField.defaultTextAttributes = memeTextAttributes
-        bottomTextField.defaultTextAttributes = memeTextAttributes
-
-        // Set text alignment after setting default text attributes
-        topTextField.textAlignment = .Center
-        bottomTextField.textAlignment = .Center
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
-        
-        // Subscribe to the keyboard notifications, to allow the view to adjust frame when necessary
-        subscribeToKeyboardNotifications()
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        unsubscribeToKeyboardNotifications()
-    }
-    
-    // MARK: Edit / cancel editing meme
-    
-    @IBAction func pickImageFromAlbum(sender: UIBarButtonItem) {
-        presentImagePicker(UIImagePickerControllerSourceType.PhotoLibrary)
-    }
-    
-    @IBAction func takeImage(sender: UIBarButtonItem) {
-        presentImagePicker(UIImagePickerControllerSourceType.Camera)
-    }
-    
-    func presentImagePicker(sourceType: UIImagePickerControllerSourceType) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = sourceType
-        self.presentViewController(imagePicker, animated: true, completion: nil)
-    }
-    
-    // Return to launch state, displaying no image and default text
-    @IBAction func cancelEditing(sender: UIBarButtonItem) {
-        imageView.image = nil
-        setTextToDefault()
-    }
-    
-    // MARK: Share meme
+    // MARK: Share / save meme
     
     @IBAction func shareMeme(sender: UIBarButtonItem) {
         let memedImage = generateMemedImage()
@@ -176,6 +152,18 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         let meme = Meme(originalImage: imageView.image!, topText: topTextField.text!, bottomText: bottomTextField.text!, memedImage: memedImage)
         
         (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
+    }
+    
+    // MARK: Cancel editing meme
+    
+    @IBAction func cancelEditing(sender: UIBarButtonItem) {
+        resetEditorView()
+    }
+    
+    // Return to launch state, displaying no image and default text
+    func resetEditorView() {
+        imageView.image = nil
+        setTextFieldsToDefault()
     }
     
     // MARK: UITextFieldDelegate
@@ -225,9 +213,29 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     
     // MARK: Helper methods
     
-    func setTextToDefault() {
+    func setTextFieldsToDefault() {
         topTextField.text = "TOP"
         bottomTextField.text = "BOTTOM"
+
+        currentFontIndex = 0
+        currentColorIndex = 0
+        setTextAttributes(fontNames[currentFontIndex] as! String, textColor: textColors[currentColorIndex] as! UIColor)
+    }
+    
+    func setTextAttributes(fontName: String, textColor: UIColor) {
+        // Set default text attributes
+        let memeTextAttributes = [
+            NSStrokeColorAttributeName : UIColor.blackColor(),
+            NSForegroundColorAttributeName : textColor,
+            NSFontAttributeName : UIFont(name: fontName, size: 40)!,
+            NSStrokeWidthAttributeName : -3 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
+        ]
+        topTextField.defaultTextAttributes = memeTextAttributes
+        bottomTextField.defaultTextAttributes = memeTextAttributes
+        
+        // Set text alignment after setting default text attributes
+        topTextField.textAlignment = .Center
+        bottomTextField.textAlignment = .Center
     }
     
     // MARK: Adjust view frame when keyboard shows/hides
@@ -255,11 +263,19 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         return keyboardSize.CGRectValue().height
     }
     
+    // Dismiss keyboard and adjust view frame when screen rotates
+    func screenDidRotate() {
+        if (bottomTextField.isFirstResponder()) {
+            bottomTextField.resignFirstResponder()
+        }
+    }
+    
     // MARK: Notifications
     
     func subscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "screenDidRotate", name: UIDeviceOrientationDidChangeNotification, object: nil)
     }
     
     func unsubscribeToKeyboardNotifications() {

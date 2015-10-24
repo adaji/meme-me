@@ -84,15 +84,6 @@
                                 <fontDescription key="fontDescription" name="Impact" family="Impact" pointSize="40"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wcI-oy-Gth">
-                                <rect key="frame" x="550" y="44" width="50" height="50"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="50" id="1ce-8f-Bdy"/>
-                                    <constraint firstAttribute="width" constant="50" id="WC2-Na-FeG"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="AcademyEngravedLetPlain" family="Academy Engraved LET" pointSize="30"/>
-                                <state key="normal" title="T"/>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -107,9 +98,7 @@
                             <constraint firstItem="pY0-ZR-Tni" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="EEc-7z-vTA"/>
                             <constraint firstItem="pY0-ZR-Tni" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="EsJ-op-QHH"/>
                             <constraint firstItem="Jlg-Hq-ME1" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="IF2-jZ-lho"/>
-                            <constraint firstItem="8l5-Lu-QpT" firstAttribute="top" secondItem="wcI-oy-Gth" secondAttribute="bottom" constant="-50" id="MDz-GU-Hbo"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="Ywu-Vv-Mag" secondAttribute="bottom" id="TtR-XQ-kJj"/>
-                            <constraint firstItem="wcI-oy-Gth" firstAttribute="leading" secondItem="8l5-Lu-QpT" secondAttribute="trailing" constant="-50" id="X0b-qQ-ZgF"/>
                             <constraint firstItem="XZs-0F-fbI" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="gUa-i9-NI1"/>
                             <constraint firstAttribute="trailingMargin" secondItem="8l5-Lu-QpT" secondAttribute="trailing" constant="-20" id="nv4-4q-e8t"/>
                             <constraint firstItem="XZs-0F-fbI" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="qrQ-wr-bvb"/>
@@ -121,7 +110,6 @@
                         <outlet property="bottomTextField" destination="pY0-ZR-Tni" id="6nc-rv-6dg"/>
                         <outlet property="cameraButton" destination="slV-qx-u9K" id="qc7-uY-JOV"/>
                         <outlet property="cancelButton" destination="mkR-4W-fCE" id="91s-te-J8C"/>
-                        <outlet property="fontButton" destination="wcI-oy-Gth" id="TrW-v6-D4P"/>
                         <outlet property="imageView" destination="8l5-Lu-QpT" id="oi9-uQ-DbH"/>
                         <outlet property="shareButton" destination="Tpe-Hp-aV9" id="u7g-xO-EhV"/>
                         <outlet property="topBar" destination="XZs-0F-fbI" id="5zE-3B-pcq"/>
