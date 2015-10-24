@@ -70,7 +70,9 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         // Show instruction for first launch
         let hasLauchedBefore = NSUserDefaults.standardUserDefaults().boolForKey("HasLaunchedBefore")
         if (hasLauchedBefore == false) {
-            // Temporarily disable vertical swipes to make sure users follow instructions
+            // Temporarily disable text fields and vertical swipes to make sure users follow instructions
+            topTextField.enabled = false
+            bottomTextField.enabled = false
             swipeUp.enabled = false
             swipeDown.enabled = false
 
@@ -185,7 +187,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
                             (value: Bool) in
                             let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(self.DEFAULT_DELAY_TIME * Double(NSEC_PER_SEC)))
                             dispatch_after(delayTime, dispatch_get_main_queue()) {
-                                self.updateInstructionLabel(instructionLabel, text: "You get it. Enjoy. :)")
+                                self.updateInstructionLabel(instructionLabel, text: "You get it. Now go ahead and create your first meme. :)")
                                 UIView.animateWithDuration(0.3, animations: {
                                     instructionLabel.alpha = 1
                                     }, completion: {
@@ -197,6 +199,10 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
                                                 }, completion: {
                                                     (value: Bool) in
                                                     instructionLabel.removeFromSuperview()
+                                                    
+                                                    // Enable text fields
+                                                    self.topTextField.enabled = true
+                                                    self.bottomTextField.enabled = true
                                             })
                                         }
                                     }
