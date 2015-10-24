@@ -9,6 +9,11 @@
 import UIKit
 
 class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
+    
+    var fontNames: NSArray!
+    var currentFontIndex: Int!
+    var textColors: NSArray!
+    var currentColorIndex: Int!
 
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var topTextField: UITextField!
@@ -18,11 +23,19 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
     
+    @IBOutlet weak var fontButton: UIButton!
+    
     @IBOutlet weak var bottomBar: UIToolbar!
     @IBOutlet weak var cameraButton: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        fontNames = ["Impact", "Legrand", "Cowboy Movie", "KBABCDoodles"]
+        currentFontIndex = 0
+        
+        textColors = [UIColor.whiteColor(), UIColor.redColor(), UIColor.blackColor()]
+        currentColorIndex = 0
         
         setupEditorView()
     }
@@ -31,21 +44,61 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         topTextField.delegate = self
         bottomTextField.delegate = self
         
+        // Set default text and text attributes
+        setTextToDefault()
+        setTextAttributes(fontNames[0] as! String, textColor: textColors[0] as! UIColor)
+        
+        // Swipe right or left to change font
+        let leftSwipe = UISwipeGestureRecognizer(target: self, action: "changeFont:")
+        leftSwipe.direction = .Left
+        self.view.addGestureRecognizer(leftSwipe)
+        let rightSwipe = UISwipeGestureRecognizer(target: self, action: "changeFont:")
+        rightSwipe.direction = .Right
+        self.view.addGestureRecognizer(rightSwipe)
+        
+        // Swipe up or down to change text color
+        let swipeUp = UISwipeGestureRecognizer(target: self, action: "changeTextColor:")
+        swipeUp.direction = .Up
+        self.view.addGestureRecognizer(swipeUp)
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: "changeTextColor:")
+        swipeDown.direction = .Down
+        self.view.addGestureRecognizer(swipeDown)
+    }
+    
+    func changeFont(sender: UISwipeGestureRecognizer) {
+        if (sender.direction == .Left) {
+            currentFontIndex = (currentFontIndex+1) % fontNames.count
+        }
+        else if (sender.direction == .Right) {
+            currentFontIndex = (currentFontIndex+fontNames.count-1) % fontNames.count
+        }
+        setTextAttributes(fontNames[currentFontIndex] as! String, textColor: textColors[currentColorIndex] as! UIColor)
+    }
+    
+    func changeTextColor(sender: UISwipeGestureRecognizer) {
+        if (sender.direction == .Up) {
+            currentColorIndex = (currentColorIndex+1) % textColors.count
+        }
+        else if (sender.direction == .Down) {
+            currentColorIndex = (currentColorIndex+textColors.count-1) % textColors.count
+        }
+        setTextAttributes(fontNames[currentFontIndex] as! String, textColor: textColors[currentColorIndex] as! UIColor)
+    }
+    
+    func setTextAttributes(fontName: String, textColor: UIColor) {
         // Set default text attributes
         let memeTextAttributes = [
             NSStrokeColorAttributeName : UIColor.blackColor(),
-            NSForegroundColorAttributeName : UIColor.whiteColor(),
-            NSFontAttributeName : UIFont(name: "HelveticaNeue-CondensedBlack", size: 40)!,
+            NSForegroundColorAttributeName : textColor,
+            NSFontAttributeName : UIFont(name: fontName, size: 40)!,
             NSStrokeWidthAttributeName : -3 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
         ]
         topTextField.defaultTextAttributes = memeTextAttributes
         bottomTextField.defaultTextAttributes = memeTextAttributes
-        
+
         // Set text alignment after setting default text attributes
         topTextField.textAlignment = .Center
         bottomTextField.textAlignment = .Center
-        
-        setTextToDefault()
     }
     
     override func viewWillAppear(animated: Bool) {
