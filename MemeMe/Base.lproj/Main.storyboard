@@ -5,9 +5,6 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <customFonts key="customFonts">
-        <mutableArray key="Futurot.ttf">
-            <string>New</string>
-        </mutableArray>
         <mutableArray key="Impact.ttf">
             <string>Impact</string>
         </mutableArray>
@@ -49,13 +46,13 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="9Rc-IZ-Nob"/>
                                 </items>
                             </toolbar>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="dlgh" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
                                 <rect key="frame" x="20" y="74" width="560" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="jxG-dW-UeD"/>
                                 </constraints>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <fontDescription key="fontDescription" name="New" family="New" pointSize="40"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters"/>
                             </textField>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XZs-0F-fbI">

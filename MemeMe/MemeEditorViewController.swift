@@ -16,7 +16,14 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     var currentForegroundColorIndex: Int!
     var strokeColors: NSArray!
     var currentStrokeColorIndex: Int!
-
+    
+    var keyboardHeight: CGFloat!
+    
+    let INSTRUCTION_LABEL_TAG = 1
+    let HorizonalSwipeInstruction = "← Swipe left or right to change font →"
+    let VerticalSwipeInstruction = "Good job.\nNow swipe up ↑ to change text color\nor\nswipe down ↓ to change stroke color"
+    let DEFAULT_DELAY_TIME = 3.0 // Unit: second
+    
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var topTextField: UITextField!
     @IBOutlet weak var bottomTextField: UITextField!
@@ -24,8 +31,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var topBar: UIToolbar!
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
-    
-    @IBOutlet weak var fontButton: UIButton!
     
     @IBOutlet weak var bottomBar: UIToolbar!
     @IBOutlet weak var cameraButton: UIBarButtonItem!
@@ -37,16 +42,15 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         foregroundColors = [UIColor.whiteColor(), UIColor.redColor(), UIColor.blueColor(), UIColor.blackColor()]
         strokeColors = [UIColor.blackColor(), UIColor.whiteColor(), UIColor.redColor(), UIColor.blueColor()]
         
-        setupEditorView()
-    }
-    
-    func setupEditorView() {
         topTextField.delegate = self
         bottomTextField.delegate = self
         
-        // Set default text and text attributes
-        setTextFieldsToDefault()
+        setupEditorView()
         
+        addGestureRecognizers()
+    }
+    
+    func addGestureRecognizers() {
         // Swipe right or left to change font
         let leftSwipe = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
         leftSwipe.direction = .Left
@@ -62,6 +66,22 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         let swipeDown = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
         swipeDown.direction = .Down
         self.view.addGestureRecognizer(swipeDown)
+
+        // Show instruction for first launch
+        let hasLauchedBefore = NSUserDefaults.standardUserDefaults().boolForKey("HasLaunchedBefore")
+        if (hasLauchedBefore == false) {
+            // Temporarily disable vertical swipes to make sure users follow instructions
+            swipeUp.enabled = false
+            swipeDown.enabled = false
+
+            let instructionLabel = UILabel()
+            instructionLabel.tag = INSTRUCTION_LABEL_TAG
+            instructionLabel.numberOfLines = 4
+            instructionLabel.textAlignment = .Center
+            instructionLabel.textColor = UIColor.orangeColor()
+            updateInstructionLabel(instructionLabel, text: HorizonalSwipeInstruction)
+            self.view.addSubview(instructionLabel)
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -100,23 +120,92 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     // MARK: Swipe to change font or text color
     
     func changeTextAttribute(sender: UISwipeGestureRecognizer) {
-        // Swipe right or left to change font
-        if (sender.direction == .Left) {
+        // Dismiss instructions
+        
+        switch (sender.direction) {
+            // Swipe left or right to change font
+        case UISwipeGestureRecognizerDirection.Left:
             currentFontIndex = (currentFontIndex + 1) % fontNames.count
-        }
-        else if (sender.direction == .Right) {
-            currentFontIndex = (currentFontIndex + fontNames.count - 1) % fontNames.count
-        }
-        // Swipe up to change foreground color
-        else if (sender.direction == .Up) {
+            showAnimatedInstructionForSwipe(true)
+            break
+        case UISwipeGestureRecognizerDirection.Right:
+            currentFontIndex = (currentFontIndex + fontNames.count - 1) % fontNames.count // Add "fontNames.count" to avoid getting negative results
+            showAnimatedInstructionForSwipe(true)
+            break
+            
+            // Swipe up to change foreground color
+        case UISwipeGestureRecognizerDirection.Up:
             currentForegroundColorIndex = (currentForegroundColorIndex + 1) % foregroundColors.count
-        }
-        // Swipe down to change stroke color
-        else if (sender.direction == .Down) {
+            showAnimatedInstructionForSwipe(false)
+            break
+            
+            // Swipe down to change stroke color
+        case UISwipeGestureRecognizerDirection.Down:
             currentStrokeColorIndex = (currentStrokeColorIndex + 1) % strokeColors.count
+            showAnimatedInstructionForSwipe(false)
+            break
+            
+        default:
+            break
         }
         
         setTextAttributes(fontNames[currentFontIndex] as! String, foregroundColor: foregroundColors[currentForegroundColorIndex] as! UIColor, strokeColor: strokeColors[currentStrokeColorIndex] as! UIColor)
+    }
+    
+    // Show animated instruction for swipe
+    func showAnimatedInstructionForSwipe(horizontal: Bool) {
+        if let instructionLabel = self.view.viewWithTag(INSTRUCTION_LABEL_TAG) as? UILabel {
+            if horizontal == true {
+                if instructionLabel.text == HorizonalSwipeInstruction {
+                    UIView.animateWithDuration(0.3, animations: {
+                        instructionLabel.alpha = 0
+                        }, completion: {
+                            (value: Bool) in
+                            let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(self.DEFAULT_DELAY_TIME * Double(NSEC_PER_SEC)))
+                            dispatch_after(delayTime, dispatch_get_main_queue()) {
+                                self.updateInstructionLabel(instructionLabel, text: self.VerticalSwipeInstruction)
+                                UIView.animateWithDuration(0.3, animations: {
+                                    instructionLabel.alpha = 1
+                                    }, completion: {
+                                        (value: Bool) in
+                                        // Enable vertical swipes
+                                        for swipe in self.view.gestureRecognizers! {
+                                            swipe.enabled = true
+                                        }
+                                })
+                            }
+                    })
+                }
+            }
+            else {
+                if instructionLabel.text == VerticalSwipeInstruction {
+                    UIView.animateWithDuration(0.3, animations: {
+                        instructionLabel.alpha = 0
+                        }, completion: {
+                            (value: Bool) in
+                            let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(self.DEFAULT_DELAY_TIME * Double(NSEC_PER_SEC)))
+                            dispatch_after(delayTime, dispatch_get_main_queue()) {
+                                self.updateInstructionLabel(instructionLabel, text: "You get it. Enjoy. :)")
+                                UIView.animateWithDuration(0.3, animations: {
+                                    instructionLabel.alpha = 1
+                                    }, completion: {
+                                        (value: Bool) in
+                                        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(self.DEFAULT_DELAY_TIME * Double(NSEC_PER_SEC)))
+                                        dispatch_after(delayTime, dispatch_get_main_queue()) {
+                                            UIView.animateWithDuration(0.4, animations: {
+                                                instructionLabel.alpha = 0
+                                                }, completion: {
+                                                    (value: Bool) in
+                                                    instructionLabel.removeFromSuperview()
+                                            })
+                                        }
+                                    }
+                                )
+                            }
+                    })
+                }
+            }
+        }
     }
     
     // MARK: Share / save meme
@@ -161,13 +250,16 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     // MARK: Cancel editing meme
     
     @IBAction func cancelEditing(sender: UIBarButtonItem) {
-        resetEditorView()
+        setupEditorView()
     }
     
     // Return to launch state, displaying no image and default text
-    func resetEditorView() {
+    func setupEditorView() {
+        shareButton.enabled = false
+        cancelButton.enabled = false
+        
         imageView.image = nil
-        setTextFieldsToDefault()
+        setupTextFields()
     }
     
     // MARK: UITextFieldDelegate
@@ -198,6 +290,14 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         return true
     }
     
+    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+        if (string != "") {
+            cancelButton.enabled = true
+        }
+        
+        return true
+    }
+    
     // MARK: UIImagePickerControllerDelegate
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
@@ -217,10 +317,11 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     
     // MARK: Helper methods
     
-    func setTextFieldsToDefault() {
+    // Set text and text attributes to default
+    func setupTextFields() {
         topTextField.text = "TOP"
         bottomTextField.text = "BOTTOM"
-
+        
         currentFontIndex = 0
         currentForegroundColorIndex = 0
         currentStrokeColorIndex = 0
@@ -243,17 +344,27 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         bottomTextField.textAlignment = .Center
     }
     
+    // Set label text and adjust label frame
+    func updateInstructionLabel(instructionLabel: UILabel, text: String) {
+        instructionLabel.text = text
+        
+        // Reset label frame to center
+        instructionLabel.sizeToFit()
+        instructionLabel.center = self.view.center
+    }
+    
     // MARK: Adjust view frame when keyboard shows/hides
-
+    
     func keyboardWillShow(notification: NSNotification) {
         if (bottomTextField.isFirstResponder()) {
-            moveViewVertically(getKeyboardHeight(notification), up: true)
+            keyboardHeight = getKeyboardHeight(notification)
+            moveViewVertically(keyboardHeight, up: true)
         }
     }
     
     func keyboardWillHide(notification: NSNotification) {
         if (bottomTextField.isFirstResponder()) {
-            moveViewVertically(getKeyboardHeight(notification), up: false)
+            moveViewVertically(keyboardHeight, up: false)
         }
     }
     

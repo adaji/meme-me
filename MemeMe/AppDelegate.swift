@@ -18,6 +18,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         application.statusBarHidden = true
         
+        // Update user defaults to remember app has launched (more than) once
+        let userDefaults = NSUserDefaults.standardUserDefaults()
+        let hasLauchedBeforeKey = "HasLaunchedBefore"
+        if let hasLaunchedBefore = userDefaults.objectForKey(hasLauchedBeforeKey) as? Bool {
+            if !hasLaunchedBefore {
+                userDefaults.setObject(true, forKey: hasLauchedBeforeKey)
+                userDefaults.synchronize()
+            }
+        }
+        else {
+            userDefaults.setObject(false, forKey: hasLauchedBeforeKey)
+            userDefaults.synchronize()
+        }
+        
         return true
     }
 
