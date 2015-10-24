@@ -12,8 +12,10 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     
     var fontNames: NSArray!
     var currentFontIndex: Int!
-    var textColors: NSArray!
-    var currentColorIndex: Int!
+    var foregroundColors: NSArray!
+    var currentForegroundColorIndex: Int!
+    var strokeColors: NSArray!
+    var currentStrokeColorIndex: Int!
 
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var topTextField: UITextField!
@@ -31,8 +33,9 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fontNames = ["Impact", "Legrand", "Cowboy Movie"]
-        textColors = [UIColor.whiteColor(), UIColor.redColor(), UIColor.blueColor(), UIColor.blackColor()]
+        fontNames = ["Impact", "IMPACTED", "Impacted 2.0", "New", "Thanatos", "Danger Diabolik"]
+        foregroundColors = [UIColor.whiteColor(), UIColor.redColor(), UIColor.blueColor(), UIColor.blackColor()]
+        strokeColors = [UIColor.blackColor(), UIColor.whiteColor(), UIColor.redColor(), UIColor.blueColor()]
         
         setupEditorView()
     }
@@ -45,18 +48,18 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         setTextFieldsToDefault()
         
         // Swipe right or left to change font
-        let leftSwipe = UISwipeGestureRecognizer(target: self, action: "changeFont:")
+        let leftSwipe = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
         leftSwipe.direction = .Left
         self.view.addGestureRecognizer(leftSwipe)
-        let rightSwipe = UISwipeGestureRecognizer(target: self, action: "changeFont:")
+        let rightSwipe = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
         rightSwipe.direction = .Right
         self.view.addGestureRecognizer(rightSwipe)
         
         // Swipe up or down to change text color
-        let swipeUp = UISwipeGestureRecognizer(target: self, action: "changeTextColor:")
+        let swipeUp = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
         swipeUp.direction = .Up
         self.view.addGestureRecognizer(swipeUp)
-        let swipeDown = UISwipeGestureRecognizer(target: self, action: "changeTextColor:")
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
         swipeDown.direction = .Down
         self.view.addGestureRecognizer(swipeDown)
     }
@@ -90,29 +93,30 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = sourceType
+        imagePicker.navigationBar.tintColor = UIColor.orangeColor() // Change image picker's nav bar tint color
         self.presentViewController(imagePicker, animated: true, completion: nil)
     }
     
     // MARK: Swipe to change font or text color
     
-    func changeFont(sender: UISwipeGestureRecognizer) {
+    func changeTextAttribute(sender: UISwipeGestureRecognizer) {
+        // Swipe right or left to change font
         if (sender.direction == .Left) {
-            currentFontIndex = (currentFontIndex+1) % fontNames.count
+            currentFontIndex = (currentFontIndex + 1) % fontNames.count
         }
         else if (sender.direction == .Right) {
-            currentFontIndex = (currentFontIndex+fontNames.count-1) % fontNames.count
+            currentFontIndex = (currentFontIndex + fontNames.count - 1) % fontNames.count
         }
-        setTextAttributes(fontNames[currentFontIndex] as! String, textColor: textColors[currentColorIndex] as! UIColor)
-    }
-    
-    func changeTextColor(sender: UISwipeGestureRecognizer) {
-        if (sender.direction == .Up) {
-            currentColorIndex = (currentColorIndex+1) % textColors.count
+        // Swipe up to change foreground color
+        else if (sender.direction == .Up) {
+            currentForegroundColorIndex = (currentForegroundColorIndex + 1) % foregroundColors.count
         }
+        // Swipe down to change stroke color
         else if (sender.direction == .Down) {
-            currentColorIndex = (currentColorIndex+textColors.count-1) % textColors.count
+            currentStrokeColorIndex = (currentStrokeColorIndex + 1) % strokeColors.count
         }
-        setTextAttributes(fontNames[currentFontIndex] as! String, textColor: textColors[currentColorIndex] as! UIColor)
+        
+        setTextAttributes(fontNames[currentFontIndex] as! String, foregroundColor: foregroundColors[currentForegroundColorIndex] as! UIColor, strokeColor: strokeColors[currentStrokeColorIndex] as! UIColor)
     }
     
     // MARK: Share / save meme
@@ -218,15 +222,16 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         bottomTextField.text = "BOTTOM"
 
         currentFontIndex = 0
-        currentColorIndex = 0
-        setTextAttributes(fontNames[currentFontIndex] as! String, textColor: textColors[currentColorIndex] as! UIColor)
+        currentForegroundColorIndex = 0
+        currentStrokeColorIndex = 0
+        setTextAttributes(fontNames[currentFontIndex] as! String, foregroundColor: foregroundColors[currentForegroundColorIndex] as! UIColor, strokeColor: strokeColors[currentStrokeColorIndex] as! UIColor)
     }
     
-    func setTextAttributes(fontName: String, textColor: UIColor) {
+    func setTextAttributes(fontName: String, foregroundColor: UIColor, strokeColor: UIColor) {
         // Set default text attributes
         let memeTextAttributes = [
-            NSStrokeColorAttributeName : UIColor.blackColor(),
-            NSForegroundColorAttributeName : textColor,
+            NSStrokeColorAttributeName : strokeColor,
+            NSForegroundColorAttributeName : foregroundColor,
             NSFontAttributeName : UIFont(name: fontName, size: 40)!,
             NSStrokeWidthAttributeName : -3 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
         ]

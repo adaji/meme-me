@@ -5,8 +5,10 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <customFonts key="customFonts">
+        <mutableArray key="Futurot.ttf">
+            <string>New</string>
+        </mutableArray>
         <mutableArray key="Impact.ttf">
-            <string>Impact</string>
             <string>Impact</string>
         </mutableArray>
     </customFonts>
@@ -33,13 +35,13 @@
                                 </constraints>
                                 <items>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="R0i-m9-xB0"/>
-                                    <barButtonItem systemItem="camera" id="slV-qx-u9K">
+                                    <barButtonItem image="camera" id="slV-qx-u9K">
                                         <connections>
                                             <action selector="takeImage:" destination="BYZ-38-t0r" id="AFC-gc-SsS"/>
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="kXt-Sb-Ro6"/>
-                                    <barButtonItem title="Album" id="SNA-xp-EVR">
+                                    <barButtonItem image="album" id="SNA-xp-EVR">
                                         <connections>
                                             <action selector="pickImageFromAlbum:" destination="BYZ-38-t0r" id="cwe-9q-Win"/>
                                         </connections>
@@ -47,13 +49,13 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="9Rc-IZ-Nob"/>
                                 </items>
                             </toolbar>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="dlgh" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
                                 <rect key="frame" x="20" y="74" width="560" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="jxG-dW-UeD"/>
                                 </constraints>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <fontDescription key="fontDescription" name="Impact" family="Impact" pointSize="40"/>
+                                <fontDescription key="fontDescription" name="New" family="New" pointSize="40"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters"/>
                             </textField>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XZs-0F-fbI">
@@ -68,7 +70,7 @@
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="AAa-cd-Xhx"/>
-                                    <barButtonItem enabled="NO" systemItem="cancel" id="mkR-4W-fCE">
+                                    <barButtonItem enabled="NO" image="cancel" id="mkR-4W-fCE">
                                         <connections>
                                             <action selector="cancelEditing:" destination="BYZ-38-t0r" id="Czg-i9-Y5L"/>
                                         </connections>
@@ -121,4 +123,10 @@
             <point key="canvasLocation" x="280" y="344"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="album" width="25" height="25"/>
+        <image name="camera" width="25" height="25"/>
+        <image name="cancel" width="25" height="25"/>
+    </resources>
+    <color key="tintColor" red="1" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
 </document>

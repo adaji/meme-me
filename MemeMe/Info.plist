@@ -4,8 +4,11 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Cowboy Movie.ttf</string>
-		<string>Legrand.ttf</string>
+		<string>Impacted2.0.ttf</string>
+		<string>IMPACTED.ttf</string>
+		<string>Danger Diabolik.ttf</string>
+		<string>Thanatos.ttf</string>
+		<string>New.ttf</string>
 		<string>Impact.ttf</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
