@@ -29,18 +29,18 @@
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="R0i-m9-xB0"/>
                                     <barButtonItem systemItem="camera" id="slV-qx-u9K">
                                         <connections>
-                                            <action selector="takeAnImage:" destination="BYZ-38-t0r" id="Ijg-O0-AA7"/>
+                                            <action selector="takeImage:" destination="BYZ-38-t0r" id="AFC-gc-SsS"/>
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem title="Album" id="SNA-xp-EVR">
                                         <connections>
-                                            <action selector="pickAnImageFromAlbum:" destination="BYZ-38-t0r" id="LQd-3C-BdP"/>
+                                            <action selector="pickImageFromAlbum:" destination="BYZ-38-t0r" id="cwe-9q-Win"/>
                                         </connections>
                                     </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="9Rc-IZ-Nob"/>
                                 </items>
                             </toolbar>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="TOP" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
                                 <rect key="frame" x="20" y="74" width="560" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="jxG-dW-UeD"/>
@@ -55,12 +55,20 @@
                                     <constraint firstAttribute="height" constant="44" id="GXS-bJ-NSS"/>
                                 </constraints>
                                 <items>
-                                    <barButtonItem enabled="NO" systemItem="action" id="Tpe-Hp-aV9"/>
+                                    <barButtonItem enabled="NO" systemItem="action" id="Tpe-Hp-aV9">
+                                        <connections>
+                                            <action selector="shareMeme:" destination="BYZ-38-t0r" id="mwT-r5-HXn"/>
+                                        </connections>
+                                    </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="AAa-cd-Xhx"/>
-                                    <barButtonItem enabled="NO" systemItem="cancel" id="mkR-4W-fCE"/>
+                                    <barButtonItem enabled="NO" systemItem="cancel" id="mkR-4W-fCE">
+                                        <connections>
+                                            <action selector="cancelEditing:" destination="BYZ-38-t0r" id="Czg-i9-Y5L"/>
+                                        </connections>
+                                    </barButtonItem>
                                 </items>
                             </toolbar>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="BOTTOM" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="pY0-ZR-Tni">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="pY0-ZR-Tni">
                                 <rect key="frame" x="20" y="476" width="560" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="sqH-qL-yQQ"/>
@@ -70,7 +78,7 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters"/>
                             </textField>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="Jlg-Hq-ME1" firstAttribute="top" secondItem="XZs-0F-fbI" secondAttribute="bottom" constant="30" id="2oP-V1-4zt"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="8l5-Lu-QpT" secondAttribute="bottom" constant="44" id="5YX-8m-8Mo"/>
@@ -94,6 +102,7 @@
                         <outlet property="bottomBar" destination="Ywu-Vv-Mag" id="6pZ-s1-Tgy"/>
                         <outlet property="bottomTextField" destination="pY0-ZR-Tni" id="6nc-rv-6dg"/>
                         <outlet property="cameraButton" destination="slV-qx-u9K" id="qc7-uY-JOV"/>
+                        <outlet property="cancelButton" destination="mkR-4W-fCE" id="91s-te-J8C"/>
                         <outlet property="imageView" destination="8l5-Lu-QpT" id="oi9-uQ-DbH"/>
                         <outlet property="shareButton" destination="Tpe-Hp-aV9" id="u7g-xO-EhV"/>
                         <outlet property="topBar" destination="XZs-0F-fbI" id="5zE-3B-pcq"/>
