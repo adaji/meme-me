@@ -101,7 +101,6 @@
                                 </items>
                             </toolbar>
                         </subviews>
-                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="XZs-0F-fbI" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="627-ke-GIP"/>
                             <constraint firstItem="XZs-0F-fbI" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="7Z5-MT-c07"/>

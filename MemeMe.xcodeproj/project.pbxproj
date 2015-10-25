@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		60341D681BDB7D1200C0F8B7 /* Impact.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D671BDB7AC200C0F8B7 /* Impact.ttf */; };
-		60341D851BDBAD5500C0F8B7 /* New.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D841BDBAD5500C0F8B7 /* New.ttf */; settings = {ASSET_TAGS = (); }; };
-		60341D871BDBB0B000C0F8B7 /* Thanatos.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D861BDBB0B000C0F8B7 /* Thanatos.ttf */; settings = {ASSET_TAGS = (); }; };
-		60341D891BDBB16300C0F8B7 /* Danger Diabolik.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D881BDBB16300C0F8B7 /* Danger Diabolik.ttf */; settings = {ASSET_TAGS = (); }; };
-		60341D8E1BDBB3E400C0F8B7 /* IMPACTED.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D8B1BDBB3E400C0F8B7 /* IMPACTED.ttf */; settings = {ASSET_TAGS = (); }; };
-		60341D8F1BDBB3E400C0F8B7 /* Impacted2.0.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D8C1BDBB3E400C0F8B7 /* Impacted2.0.ttf */; settings = {ASSET_TAGS = (); }; };
+		60341D851BDBAD5500C0F8B7 /* New.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D841BDBAD5500C0F8B7 /* New.ttf */; };
+		60341D871BDBB0B000C0F8B7 /* Thanatos.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D861BDBB0B000C0F8B7 /* Thanatos.ttf */; };
+		60341D891BDBB16300C0F8B7 /* Danger Diabolik.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D881BDBB16300C0F8B7 /* Danger Diabolik.ttf */; };
+		60341D8E1BDBB3E400C0F8B7 /* IMPACTED.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D8B1BDBB3E400C0F8B7 /* IMPACTED.ttf */; };
+		60341D8F1BDBB3E400C0F8B7 /* Impacted2.0.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60341D8C1BDBB3E400C0F8B7 /* Impacted2.0.ttf */; };
 		604293191BD4BA4C0023E3D3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604293181BD4BA4C0023E3D3 /* AppDelegate.swift */; };
 		6042931B1BD4BA4C0023E3D3 /* MemeEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6042931A1BD4BA4C0023E3D3 /* MemeEditorViewController.swift */; };
 		6042931E1BD4BA4C0023E3D3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6042931C1BD4BA4C0023E3D3 /* Main.storyboard */; };
@@ -20,7 +20,7 @@
 		604293231BD4BA4C0023E3D3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 604293211BD4BA4C0023E3D3 /* LaunchScreen.storyboard */; };
 		6042932E1BD4BA4C0023E3D3 /* MemeMeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6042932D1BD4BA4C0023E3D3 /* MemeMeTests.swift */; };
 		604293391BD4BA4C0023E3D3 /* MemeMeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604293381BD4BA4C0023E3D3 /* MemeMeUITests.swift */; };
-		60A66F4F1BD4F9B0009EB55D /* Meme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A66F4E1BD4F9B0009EB55D /* Meme.swift */; settings = {ASSET_TAGS = (); }; };
+		60A66F4F1BD4F9B0009EB55D /* Meme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A66F4E1BD4F9B0009EB55D /* Meme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
