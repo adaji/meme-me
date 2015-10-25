@@ -24,6 +24,8 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     let VerticalSwipeInstruction = "Good job.\nNow swipe up ↑ to change text color\nor\nswipe down ↓ to change stroke color"
     let DEFAULT_DELAY_TIME = 3.0 // Unit: second
     
+    @IBOutlet weak var memeView: UIView! // Contains image view and text fields
+    
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var topTextField: UITextField!
     @IBOutlet weak var bottomTextField: UITextField!
@@ -230,19 +232,17 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     func generateMemedImage() -> UIImage {
-        // hide top/bottom bar
-        topBar.hidden = true
-        bottomBar.hidden = true
+        // Change meme view background color to white
+        memeView.backgroundColor = UIColor.whiteColor()
         
         // Render view to an image
-        UIGraphicsBeginImageContext(self.view.frame.size)
-        self.view.drawViewHierarchyInRect(self.view.frame, afterScreenUpdates: true)
+        UIGraphicsBeginImageContext(memeView.frame.size)
+        self.memeView.drawViewHierarchyInRect(CGRect(origin: CGPoint(x: 0, y: 0), size: memeView.frame.size), afterScreenUpdates: true)
         let memedImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        // show top/bottom bar
-        topBar.hidden = false
-        bottomBar.hidden = false
+        // Change meme view background color back
+        memeView.backgroundColor = UIColor.darkGrayColor()
         
         return memedImage
     }
