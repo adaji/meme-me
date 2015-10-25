@@ -194,7 +194,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
                                     instructionLabel.alpha = 1
                                     }, completion: {
                                         (value: Bool) in
-                                        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(5 * Double(NSEC_PER_SEC)))
+                                        let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(self.DEFAULT_DELAY_TIME * Double(NSEC_PER_SEC)))
                                         dispatch_after(delayTime, dispatch_get_main_queue()) {
                                             UIView.animateWithDuration(0.5, animations: {
                                                 instructionLabel.alpha = 0
