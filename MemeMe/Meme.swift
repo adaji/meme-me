@@ -9,17 +9,9 @@
 import Foundation
 import UIKit
 
-class Meme: NSObject {
-    var originalImage: UIImage!
-    var topText: NSString!
-    var bottomText: NSString!
-    var memedImage: UIImage!
-
-    init(originalImage: UIImage!, topText: NSString!, bottomText: NSString!, memedImage: UIImage!) {
-        self.originalImage = originalImage
-        self.topText = topText
-        self.bottomText = bottomText
-        self.memedImage = memedImage
-    }
+struct Meme {
+    var topText: String
+    var bottomText: String
+    var image: UIImage
+    var memedImage: UIImage
 }
-
