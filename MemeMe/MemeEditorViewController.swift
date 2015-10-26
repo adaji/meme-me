@@ -47,31 +47,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         
         setEditorViewToDefault()
         
-        addSwipeRecognizers()
-    }
-    
-    func addSwipeRecognizers() {
-        // Swipe right or left to change font
-        let leftSwipe = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
-        leftSwipe.direction = .Left
-        view.addGestureRecognizer(leftSwipe)
-        let rightSwipe = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
-        rightSwipe.direction = .Right
-        view.addGestureRecognizer(rightSwipe)
-        
-        // Swipe up or down to change text color
-        let swipeUp = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
-        swipeUp.direction = .Up
-        view.addGestureRecognizer(swipeUp)
-        let swipeDown = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
-        swipeDown.direction = .Down
-        view.addGestureRecognizer(swipeDown)
-
-        // Show instructions at the first launch
-        shouldShowInstructions = !NSUserDefaults.standardUserDefaults().boolForKey("HasLaunchedBefore")
-        if shouldShowInstructions! {
-            showInstructions()
-        }
+        addGestureRecognizers()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -184,6 +160,27 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     
     @IBAction func cancelEditing(sender: UIBarButtonItem) {
         setEditorViewToDefault()
+    }
+    
+    // MARK: Gestures
+    
+    func addGestureRecognizers() {
+        for direction: UISwipeGestureRecognizerDirection in [.Left, .Right, .Up, .Down] {
+            addSwipeRecognizer(direction)
+        }
+        
+        // Show instructions at the first launch
+        shouldShowInstructions = !NSUserDefaults.standardUserDefaults().boolForKey("HasLaunchedBefore")
+        if shouldShowInstructions! {
+            showInstructions()
+        }
+    }
+    
+    func addSwipeRecognizer(direction: UISwipeGestureRecognizerDirection) {
+        // Swipe right or left to change font
+        let swipe = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
+        swipe.direction = direction
+        view.addGestureRecognizer(swipe)
     }
     
     // MARK: UITextFieldDelegate
