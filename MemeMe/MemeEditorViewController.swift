@@ -23,6 +23,8 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
     
+    var meme: Meme!
+//    private var textAttributes: [String: String]!
     private let fontNames: [String] = ["Impact", "IMPACTED", "Impacted 2.0", "New", "Thanatos", "Danger Diabolik"]
     private var currentFontIndex: Int!
     private let foregroundColors: [String] = ["white", "red", "blue", "black"]
@@ -111,7 +113,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             break
         }
         
-        setTextAttributes(fontNames[currentFontIndex], foregroundColor: colorForString(foregroundColors[currentForegroundColorIndex]), strokeColor: colorForString(strokeColors[currentStrokeColorIndex]))
+        setTextAttributes(fontNames[currentFontIndex], foregroundColor: stringToColor(foregroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(strokeColors[currentStrokeColorIndex]))
         
         // Show instructions at the first launch
         if shouldShowInstructions! {
@@ -130,7 +132,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             (activity, success, items, error) in
             if success {
                 self.saveMeme(memedImage)
-                self.dismissViewControllerAnimated(true, completion: nil)
             }
         }
         presentViewController(activityVC, animated: true, completion: nil)
@@ -153,13 +154,17 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     func saveMeme(memedImage: UIImage) {
-        let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, image: imageView.image!, memedImage: memedImage)
+        let meme = Meme(top: topTextField.text!, bottom: bottomTextField.text!, attributes: topTextField.defaultTextAttributes, image: imageView.image!, memedImage: memedImage)
         
         (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
+        
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     @IBAction func cancelEditing(sender: UIBarButtonItem) {
         setEditorViewToDefault()
+        
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     // MARK: Gestures
@@ -211,14 +216,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         return true
     }
     
-    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        if (string != "") {
-            cancelButton.enabled = true
-        }
-        
-        return true
-    }
-    
     // MARK: UIImagePickerControllerDelegate
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
@@ -228,7 +225,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             imageView.image = image
             
             shareButton.enabled = true
-            cancelButton.enabled = true
         }
     }
     
@@ -241,11 +237,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     // Return to launch state, displaying no image and default text
     func setEditorViewToDefault() {
         shareButton.enabled = false
-        cancelButton.enabled = false
-        
-        currentFontIndex = 0
-        currentForegroundColorIndex = 0
-        currentStrokeColorIndex = 0
         
         imageView.image = nil
         setTextFieldsToDefault()
@@ -256,38 +247,26 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         topTextField.text = "TOP"
         bottomTextField.text = "BOTTOM"
         
-        setTextAttributes(fontNames[currentFontIndex], foregroundColor: colorForString(foregroundColors[currentForegroundColorIndex]), strokeColor: colorForString(strokeColors[currentStrokeColorIndex]))
+        currentFontIndex = 0
+        currentForegroundColorIndex = 0
+        currentStrokeColorIndex = 0
+        
+        setTextAttributes(fontNames[currentFontIndex], foregroundColor: stringToColor(foregroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(strokeColors[currentStrokeColorIndex]))
     }
     
     func setTextAttributes(fontName: String, foregroundColor: UIColor, strokeColor: UIColor) {
-        // Set default text attributes
-        let memeTextAttributes = [
+        let textAttributes = [
             NSStrokeColorAttributeName : strokeColor,
             NSForegroundColorAttributeName : foregroundColor,
             NSFontAttributeName : UIFont(name: fontName, size: 40)!,
             NSStrokeWidthAttributeName : -3 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
         ]
-        topTextField.defaultTextAttributes = memeTextAttributes
-        bottomTextField.defaultTextAttributes = memeTextAttributes
+        topTextField.defaultTextAttributes = textAttributes
+        bottomTextField.defaultTextAttributes = textAttributes
         
         // Set text alignment after setting default text attributes
         topTextField.textAlignment = .Center
         bottomTextField.textAlignment = .Center
-    }
-    
-    func colorForString(colorName: String) -> UIColor {
-        switch colorName {
-        case "white":
-            return UIColor.whiteColor()
-        case "black":
-            return UIColor.blackColor()
-        case "red":
-            return UIColor.redColor()
-        case "blue":
-            return UIColor.blueColor()
-        default:
-            return UIColor.clearColor()
-        }
     }
     
     // Set label text and adjust label frame to the center
