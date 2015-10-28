@@ -14,17 +14,17 @@ class MemeTableViewCell: UITableViewCell {
     @IBOutlet weak var topLabel: UILabel!
     @IBOutlet weak var bottomLabel: UILabel!
     @IBOutlet weak var memeTextLabel: UILabel!
-    @IBOutlet weak var timeLabel: UILabel!
+    @IBOutlet weak var dateLabel: UILabel!
     
-    func setMeme(image: UIImage, top: String, bottom: String, attributes: [String: AnyObject], time: String) {
+    func setMeme(image: UIImage, topText: String, bottomText: String, textAttributes: [String: AnyObject], sentDate: String) {
         memeImageView.image = image
 
-        let textAttributes = textAttributesWithFontSize(attributes, size: 14)
-        topLabel.attributedText = NSAttributedString(string: top, attributes: textAttributes)
-        bottomLabel.attributedText = NSAttributedString(string: bottom, attributes: textAttributes)
-        memeTextLabel.text = top + "..." + bottom
+        let attributes = textAttributesWithFontSize(textAttributes, size: 14)
+        topLabel.attributedText = NSAttributedString(string: topText, attributes: attributes)
+        bottomLabel.attributedText = NSAttributedString(string: bottomText, attributes: attributes)
+        memeTextLabel.text = topText + "..." + bottomText
 
-        timeLabel.text = time
+        dateLabel.text = sentDate
     }
     
 }

@@ -30,7 +30,7 @@ class SentMemesCollectionViewController: UICollectionViewController {
         switch kind {
         case UICollectionElementKindSectionHeader:
             let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MemeCollectionHeaderView", forIndexPath: indexPath) as! MemeCollectionHeaderView
-            headerView.titleLabel.text = indexPath.section == 0 ? "Today" : "Before"
+            headerView.titleLabel.text = dateGroups[indexPath.section]
             
             return headerView
             
@@ -46,7 +46,7 @@ class SentMemesCollectionViewController: UICollectionViewController {
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionViewCell", forIndexPath: indexPath) as! MemeCollectionViewCell
         let meme = memes[indexPath.row]
-        cell.setMeme(meme.image, top: meme.top, bottom: meme.bottom, attributes: meme.attributes)
+        cell.setMeme(meme.originalImage, topText: meme.topText, bottomText: meme.bottomText, textAttributes: meme.textAttributes)
         
         return cell
     }

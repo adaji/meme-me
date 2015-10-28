@@ -242,9 +242,9 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="bottomLabel" destination="pvh-Fg-K3L" id="V4s-5e-6te"/>
+                                    <outlet property="dateLabel" destination="Uvb-5l-Rar" id="gQ8-fu-OO3"/>
                                     <outlet property="memeImageView" destination="CcH-9B-jYD" id="GA7-6K-Iz1"/>
                                     <outlet property="memeTextLabel" destination="B46-Ju-Z3B" id="NsF-L7-GJP"/>
-                                    <outlet property="timeLabel" destination="Uvb-5l-Rar" id="H5G-Iu-0uW"/>
                                     <outlet property="topLabel" destination="cFj-XZ-rnd" id="xBx-WJ-NH0"/>
                                 </connections>
                             </tableViewCell>
@@ -433,7 +433,7 @@
         <image name="list" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="3C1-3N-0mA"/>
+        <segue reference="scQ-nY-TMx"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="1" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
 </document>

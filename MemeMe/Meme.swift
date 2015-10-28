@@ -10,11 +10,11 @@ import Foundation
 import UIKit
 
 struct Meme {
-    var sentTime: NSDate
+    var sentDate: NSDate
     
-    var top: String
-    var bottom: String
-    var attributes: [String: AnyObject]
-    var image: UIImage
+    var topText: String
+    var bottomText: String
+    var textAttributes: [String: AnyObject]
+    var originalImage: UIImage
     var memedImage: UIImage
 }

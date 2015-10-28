@@ -193,8 +193,8 @@
 			isa = PBXGroup;
 			children = (
 				60C5CFA31BDF7C8500C79CC8 /* MemeTableViewCell.swift */,
-				6098B6571BE09FAF0031246D /* MemeCollectionHeaderView.swift */,
 				60B17FC41BDF574800A14F59 /* MemeCollectionViewCell.swift */,
+				6098B6571BE09FAF0031246D /* MemeCollectionHeaderView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";

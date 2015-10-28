@@ -9,17 +9,34 @@
 import Foundation
 import UIKit
 
-let dateGroups = ["Today", "Before"]
+let dateGroups = ["Latest", "Older"]
 
-func dateStringFromDate(date: NSDate) -> String {
+// Date format
+// Today: time only, e.g. "10:30"
+// Yesterday: "Yesterday"
+// This week: weekday only, e.g. "Monday"
+// Before this week: date only, e.g. "09/28/15"
+func stringFromDate(date: NSDate) -> String {
     let formatter = NSDateFormatter()
-    formatter.dateFormat = "MM d"
-    return formatter.stringFromDate(date)
-}
 
-func timeStringFromDate(date: NSDate) -> String {
-    let formatter = NSDateFormatter()
-    formatter.dateFormat = "HH:mm"
+    let today = NSDate()
+    let calendar = NSCalendar.currentCalendar()
+    if calendar.compareDate(date, toDate: today, toUnitGranularity: .Day) == .OrderedSame {
+        formatter.dateFormat = "HH:mm"
+    }
+    else {
+        let yesterday = calendar.dateByAddingUnit(.Day, value: -1, toDate: today, options: NSCalendarOptions(rawValue: 0))!
+        if calendar.compareDate(date, toDate: yesterday, toUnitGranularity: .Day) == .OrderedSame {
+            return "Yesterday"
+        }
+        else if calendar.compareDate(date, toDate: today, toUnitGranularity: .WeekOfYear) == .OrderedSame {
+            formatter.dateFormat = "EEEE"
+        }
+        else {
+            formatter.dateFormat = "MM/dd/yy"
+        }
+    }
+
     return formatter.stringFromDate(date)
 }
 

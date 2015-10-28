@@ -14,12 +14,12 @@ class MemeCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var topLabel: UILabel!
     @IBOutlet weak var bottomLabel: UILabel!
     
-    func setMeme(image: UIImage, top: String, bottom: String, attributes: [String: AnyObject]) {
+    func setMeme(image: UIImage, topText: String, bottomText: String, textAttributes: [String: AnyObject]) {
         memeImageView.image = image
 
-        let textAttributes = textAttributesWithFontSize(attributes, size: 14)
-        topLabel.attributedText = NSAttributedString(string: top, attributes: textAttributes)
-        bottomLabel.attributedText = NSAttributedString(string: bottom, attributes: textAttributes)
+        let attributes = textAttributesWithFontSize(textAttributes, size: 14)
+        topLabel.attributedText = NSAttributedString(string: topText, attributes: attributes)
+        bottomLabel.attributedText = NSAttributedString(string: bottomText, attributes: attributes)
     }
     
 }
