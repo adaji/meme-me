@@ -14,9 +14,9 @@ class MemeCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var bottomLabel: UILabel!
     
     func setText(top: String, bottom: String, attributes: [String: AnyObject]) {
-        var textAttributes = attributes
-        textAttributes[NSFontAttributeName] = UIFont(name: (attributes[NSFontAttributeName]?.fontName)!, size: 12)
+        let textAttributes = textAttributesWithFontSize(attributes, size: 14)
         topLabel.attributedText = NSAttributedString(string: top, attributes: textAttributes)
         bottomLabel.attributedText = NSAttributedString(string: bottom, attributes: textAttributes)
     }
+    
 }

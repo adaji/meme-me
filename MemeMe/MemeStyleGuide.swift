@@ -9,6 +9,13 @@
 import Foundation
 import UIKit
 
+func textAttributesWithFontSize(attributes: [String: AnyObject], size: CGFloat) -> [String: AnyObject] {
+    var textAttributes = attributes
+    textAttributes[NSFontAttributeName] = UIFont(name: (attributes[NSFontAttributeName]?.fontName)!, size: size)
+    
+    return textAttributes
+}
+
 func stringToColor(colorName: String) -> UIColor {
     switch colorName {
     case "white":
