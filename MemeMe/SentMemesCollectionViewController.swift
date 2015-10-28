@@ -22,8 +22,25 @@ class SentMemesCollectionViewController: UICollectionViewController {
     
     // MARK: Collection View Data Source
     
+    override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+        return dateGroups.count
+    }
+    
+    override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionElementKindSectionHeader:
+            let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MemeCollectionHeaderView", forIndexPath: indexPath) as! MemeCollectionHeaderView
+            headerView.titleLabel.text = indexPath.section == 0 ? "Today" : "Before"
+            
+            return headerView
+            
+        default:
+            assert(false, "Unexpected element kind")
+        }
+    }
+    
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return memes.count
+        return section == 0 ? memes.count : 0
     }
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {

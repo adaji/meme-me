@@ -27,15 +27,23 @@ class SentMemesTableViewController: UITableViewController {
     
     // MARK: Table View Data Source
     
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return dateGroups.count
+    }
+    
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return dateGroups[section]
+    }
+
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return memes.count
+        return section == 0 ? memes.count : 0
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeTableViewCell")! as! MemeTableViewCell
         let meme = memes[indexPath.row]
         
-        cell.setMeme(meme.image, top: meme.top, bottom: meme.bottom, attributes: meme.attributes, time: "10:30")
+        cell.setMeme(meme.image, top: meme.top, bottom: meme.bottom, attributes: meme.attributes, time: timeStringFromDate(meme.sentTime))
         
         return cell
     }

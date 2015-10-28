@@ -10,6 +10,8 @@ import Foundation
 import UIKit
 
 struct Meme {
+    var sentTime: NSDate
+    
     var top: String
     var bottom: String
     var attributes: [String: AnyObject]

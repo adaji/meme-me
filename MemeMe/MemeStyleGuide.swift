@@ -9,6 +9,20 @@
 import Foundation
 import UIKit
 
+let dateGroups = ["Today", "Before"]
+
+func dateStringFromDate(date: NSDate) -> String {
+    let formatter = NSDateFormatter()
+    formatter.dateFormat = "MM d"
+    return formatter.stringFromDate(date)
+}
+
+func timeStringFromDate(date: NSDate) -> String {
+    let formatter = NSDateFormatter()
+    formatter.dateFormat = "HH:mm"
+    return formatter.stringFromDate(date)
+}
+
 func textAttributesWithFontSize(attributes: [String: AnyObject], size: CGFloat) -> [String: AnyObject] {
     var textAttributes = attributes
     textAttributes[NSFontAttributeName] = UIFont(name: (attributes[NSFontAttributeName]?.fontName)!, size: size)
@@ -27,7 +41,7 @@ func stringToColor(colorName: String) -> UIColor {
     case "blue":
         return UIColor.blueColor()
     default:
-        return UIColor.clearColor()
+        assert(false, "Unknown color")
     }
 }
 
@@ -42,7 +56,19 @@ func colorToString(color: UIColor) -> String {
     case UIColor.blueColor():
         return "blue"
     default:
-        return "clear"
+        assert(false, "Unknown color")
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

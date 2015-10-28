@@ -212,7 +212,7 @@
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uvb-5l-Rar">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Uvb-5l-Rar">
                                             <rect key="frame" x="136" y="97" width="456" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="21" id="iqv-6T-dcZ"/>
@@ -226,7 +226,7 @@
                                         <constraint firstItem="Uvb-5l-Rar" firstAttribute="trailing" secondItem="PEu-Cg-jpC" secondAttribute="trailingMargin" id="5dk-3b-hV1"/>
                                         <constraint firstItem="pvh-Fg-K3L" firstAttribute="centerX" secondItem="CcH-9B-jYD" secondAttribute="centerX" constant="1" id="6E5-QR-1eA"/>
                                         <constraint firstAttribute="bottomMargin" secondItem="CcH-9B-jYD" secondAttribute="bottom" constant="-6" id="6bD-Vw-415"/>
-                                        <constraint firstItem="Uvb-5l-Rar" firstAttribute="bottom" secondItem="PEu-Cg-jpC" secondAttribute="bottomMargin" constant="7" id="7DT-KB-DY1"/>
+                                        <constraint firstItem="Uvb-5l-Rar" firstAttribute="bottom" secondItem="PEu-Cg-jpC" secondAttribute="bottomMargin" constant="6" id="7DT-KB-DY1"/>
                                         <constraint firstItem="B46-Ju-Z3B" firstAttribute="leading" secondItem="CcH-9B-jYD" secondAttribute="trailing" constant="10" id="DZx-gL-jMI"/>
                                         <constraint firstItem="Uvb-5l-Rar" firstAttribute="leading" secondItem="CcH-9B-jYD" secondAttribute="trailing" constant="10" id="G5N-Ol-aCh"/>
                                         <constraint firstItem="CcH-9B-jYD" firstAttribute="top" secondItem="PEu-Cg-jpC" secondAttribute="topMargin" constant="-8" id="Jqx-ha-7NF"/>
@@ -312,13 +312,13 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="b9y-xq-Per">
                             <size key="itemSize" width="100" height="100"/>
-                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="headerReferenceSize" width="50" height="28"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
                             <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MemeCollectionViewCell" id="Z4D-2Z-RQu" customClass="MemeCollectionViewCell" customModule="MemeMe" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="64" width="120" height="120"/>
+                                <rect key="frame" x="0.0" y="92" width="120" height="120"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                     <rect key="frame" x="0.0" y="0.0" width="120" height="120"/>
@@ -367,6 +367,27 @@
                                 </connections>
                             </collectionViewCell>
                         </cells>
+                        <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="MemeCollectionHeaderView" id="6Hi-bm-0Qp" customClass="MemeCollectionHeaderView" customModule="MemeMe" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="64" width="600" height="28"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GNX-Ln-ebQ">
+                                    <rect key="frame" x="16" y="4" width="569" height="20.5"/>
+                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <color key="backgroundColor" red="0.96078431372549022" green="0.96078431372549022" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstItem="GNX-Ln-ebQ" firstAttribute="centerY" secondItem="6Hi-bm-0Qp" secondAttribute="centerY" id="Ggl-LW-xkZ"/>
+                                <constraint firstItem="GNX-Ln-ebQ" firstAttribute="leading" secondItem="6Hi-bm-0Qp" secondAttribute="leadingMargin" constant="8" id="xdM-wP-1Ye"/>
+                                <constraint firstItem="GNX-Ln-ebQ" firstAttribute="centerX" secondItem="6Hi-bm-0Qp" secondAttribute="centerX" id="znm-1e-e4l"/>
+                            </constraints>
+                            <connections>
+                                <outlet property="titleLabel" destination="GNX-Ln-ebQ" id="WBS-jD-xH3"/>
+                            </connections>
+                        </collectionReusableView>
                         <connections>
                             <outlet property="dataSource" destination="egS-cN-Jdx" id="c8x-p2-SLQ"/>
                             <outlet property="delegate" destination="egS-cN-Jdx" id="JIM-tq-nLa"/>
@@ -412,7 +433,7 @@
         <image name="list" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="scQ-nY-TMx"/>
+        <segue reference="3C1-3N-0mA"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="1" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
 </document>
