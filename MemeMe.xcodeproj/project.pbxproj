@@ -134,8 +134,8 @@
 			isa = PBXGroup;
 			children = (
 				60A66F4E1BD4F9B0009EB55D /* Meme.swift */,
-				60C5CFA51BDF7C9200C79CC8 /* Views */,
 				60B17FC61BDF57FC00A14F59 /* View Controllers */,
+				60C5CFA51BDF7C9200C79CC8 /* Views */,
 				60C5CFA11BDF78A600C79CC8 /* MemeStyleGuide.swift */,
 				604293181BD4BA4C0023E3D3 /* AppDelegate.swift */,
 				6042931C1BD4BA4C0023E3D3 /* Main.storyboard */,

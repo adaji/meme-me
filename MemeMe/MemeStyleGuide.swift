@@ -9,7 +9,27 @@
 import Foundation
 import UIKit
 
-let dateGroups = ["Latest", "Older"]
+// Text attributes
+
+let FontNames: [String] = ["Impact", "IMPACTED", "Impacted 2.0", "New", "Thanatos", "Danger Diabolik"]
+let ForegroundColors: [String] = ["white", "red", "blue", "black"]
+let StrokeColors: [String] = ["black", "white", "red", "blue"]
+
+func textAttributesWithFontSize(attributes: [String: AnyObject], size: CGFloat) -> [String: AnyObject] {
+    var textAttributes = attributes
+    textAttributes[NSFontAttributeName] = UIFont(name: (attributes[NSFontAttributeName]?.fontName)!, size: size)
+    
+    return textAttributes
+}
+
+// Dates
+
+enum DateGroup: Int {
+    case Latest = 0
+    case Older
+}
+
+let DateGroups = ["Latest", "Older"]
 
 // Date format
 // Today: time only, e.g. "10:30"
@@ -40,12 +60,7 @@ func stringFromDate(date: NSDate) -> String {
     return formatter.stringFromDate(date)
 }
 
-func textAttributesWithFontSize(attributes: [String: AnyObject], size: CGFloat) -> [String: AnyObject] {
-    var textAttributes = attributes
-    textAttributes[NSFontAttributeName] = UIFont(name: (attributes[NSFontAttributeName]?.fontName)!, size: size)
-    
-    return textAttributes
-}
+// Colors
 
 func stringToColor(colorName: String) -> UIColor {
     switch colorName {

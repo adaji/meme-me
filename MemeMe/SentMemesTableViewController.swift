@@ -8,15 +8,29 @@
 
 import UIKit
 
-class SentMemesTableViewController: UITableViewController, MemeEditorViewControllerDelegate {
+class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegate {
     
-    var memes: [Meme]!
-    var hasNewMemeToDisplay: Bool!
+    private var memes: [Meme]!
+    private let olderMemes: [Meme] = Meme.olderMemes
     
-    func didSendMeme(meme: Meme) {
-        memes.append(meme)
-        hasNewMemeToDisplay = true
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
     }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
+
+        // For better performance, insert new meme at the end
+        let nRows = tableView.numberOfRowsInSection(DateGroup.Latest.rawValue)
+        if nRows < memes.count {
+            tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: nRows, inSection: DateGroup.Latest.rawValue)], withRowAnimation: .Automatic)
+        }
+    }
+    
+    // MARK: Actions
     
     @IBAction func createMeme(sender: UIBarButtonItem) {
         let memeEditorVC = storyboard!.instantiateViewControllerWithIdentifier("MemeEditorViewController") as! MemeEditorViewController
@@ -25,40 +39,23 @@ class SentMemesTableViewController: UITableViewController, MemeEditorViewControl
         presentViewController(memeEditorVC, animated: true, completion: nil)
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
-        hasNewMemeToDisplay = false
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // For better performance, insert new meme at the end
-        if hasNewMemeToDisplay! {
-            tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: tableView.numberOfRowsInSection(0), inSection: 0)], withRowAnimation: .Automatic)
-            hasNewMemeToDisplay = false
-        }
-    }
-    
     // MARK: Table View Data Source
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return dateGroups.count
+        return DateGroups.count
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return dateGroups[section]
+        return DateGroups[section]
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? memes.count : 0
+        return memesForGroup(section).count
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeTableViewCell")! as! MemeTableViewCell
-        let meme = memes[indexPath.row]
+        let meme = memesForGroup(indexPath.section)[indexPath.row]
         
         cell.setMeme(meme.originalImage, topText: meme.topText, bottomText: meme.bottomText, textAttributes: meme.textAttributes, sentDate: stringFromDate(meme.sentDate))
         
@@ -75,9 +72,27 @@ class SentMemesTableViewController: UITableViewController, MemeEditorViewControl
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         
         let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        detailVC.meme = memes[indexPath.row]
+        detailVC.meme = memesForGroup(indexPath.section)[indexPath.row]
         
         navigationController!.pushViewController(detailVC, animated: true)
+    }
+    
+    // MARK: Meme Editor View Delegate
+    
+    func didSendMeme(meme: Meme) {
+    }
+    
+    // MARK: Helper Methods
+    
+    func memesForGroup(group: Int) -> [Meme] {
+        switch group {
+        case DateGroup.Latest.rawValue:
+            return memes
+        case DateGroup.Older.rawValue:
+            return olderMemes
+        default:
+            assert(false, "Unknown date group type")
+        }
     }
     
 }

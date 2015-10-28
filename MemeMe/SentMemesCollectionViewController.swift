@@ -8,22 +8,45 @@
 
 import UIKit
 
-class SentMemesCollectionViewController: UICollectionViewController, MemeEditorViewControllerDelegate {
+class SentMemesCollectionViewController: UICollectionViewController, MemeEditorViewDelegate {
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     var memes: [Meme]!
+    private let olderMemes: [Meme] = Meme.olderMemes
     
     private let MINIMUM_SPACING: CGFloat = 3.0
     private let NUMBER_OF_ITEMS_IN_PORTRAIT_LINE: Int = 3
     private let NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE: Int = 5
     
-    private var hasNewMemeToDisplay: Bool!
-    
-    func didSendMeme(meme: Meme) {
-        memes.append(meme)
-        hasNewMemeToDisplay = true
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        flowLayout.minimumInteritemSpacing = MINIMUM_SPACING
+        flowLayout.minimumLineSpacing = MINIMUM_SPACING
+        flowLayout.itemSize = itemSize()
     }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
+        
+        // For better performance, insert new meme at the end
+        let nItems = collectionView!.numberOfItemsInSection(DateGroup.Latest.rawValue)
+        if nItems < memes.count {
+            collectionView!.insertItemsAtIndexPaths([NSIndexPath(forItem: nItems, inSection: DateGroup.Latest.rawValue)])
+        }
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        
+        // Adjust item size when rotates
+        flowLayout.itemSize = itemSize()
+    }
+    
+    // MARK: Actions
     
     @IBAction func createMeme(sender: UIBarButtonItem) {
         let memeEditorVC = storyboard!.instantiateViewControllerWithIdentifier("MemeEditorViewController") as! MemeEditorViewController
@@ -32,51 +55,17 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
         presentViewController(memeEditorVC, animated: true, completion: nil)
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        flowLayout.minimumInteritemSpacing = MINIMUM_SPACING
-        flowLayout.minimumLineSpacing = MINIMUM_SPACING
-        
-        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
-        hasNewMemeToDisplay = false
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // For better performance, insert new meme at the end
-        if (hasNewMemeToDisplay!) {
-            collectionView!.insertItemsAtIndexPaths([NSIndexPath(forItem: collectionView!.numberOfItemsInSection(0), inSection: 0)])
-            hasNewMemeToDisplay = false
-        }
-    }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        
-        // Adjust item size when rotates
-        var dimension: CGFloat
-        if UIDeviceOrientationIsPortrait(UIDevice.currentDevice().orientation) {
-            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_IN_PORTRAIT_LINE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_IN_PORTRAIT_LINE)
-        }
-        else {
-            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE)
-        }
-        flowLayout.itemSize = CGSizeMake(dimension, dimension)
-    }
-    
     // MARK: Collection View Data Source
     
     override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        return dateGroups.count
+        return DateGroups.count
     }
     
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionElementKindSectionHeader:
             let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MemeCollectionHeaderView", forIndexPath: indexPath) as! MemeCollectionHeaderView
-            headerView.titleLabel.text = dateGroups[indexPath.section]
+            headerView.titleLabel.text = DateGroups[indexPath.section]
             
             return headerView
             
@@ -86,12 +75,12 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
     }
     
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == 0 ? memes.count : 0
+        return section == 0 ? memes.count : olderMemes.count
     }
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionViewCell", forIndexPath: indexPath) as! MemeCollectionViewCell
-        let meme = memes[indexPath.row]
+        let meme = memesForGroup(indexPath.section)[indexPath.row]
         cell.setMeme(meme.originalImage, topText: meme.topText, bottomText: meme.bottomText, textAttributes: meme.textAttributes)
         
         return cell
@@ -103,24 +92,39 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
         collectionView.deselectItemAtIndexPath(indexPath, animated: true)
         
         let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        detailVC.meme = memes[indexPath.row]
+        detailVC.meme = memesForGroup(indexPath.section)[indexPath.row]
         navigationController!.pushViewController(detailVC, animated: true)
     }
     
-    // Adjust item size when screen rotates
-    func screenDidRotate() {
-        let space: CGFloat = 3.0
+    // MARK: Meme Editor View Delegate
+    
+    func didSendMeme(meme: Meme) {
+    }
+    
+    // MARK: Helper Methods
+    
+    // Adjust item size for different orientations
+    func itemSize() -> CGSize {
         var dimension: CGFloat
         if UIDeviceOrientationIsPortrait(UIDevice.currentDevice().orientation) {
-            dimension = (self.view.frame.size.width - 2 * space) / 3.0
+            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_IN_PORTRAIT_LINE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_IN_PORTRAIT_LINE)
         }
         else {
-            dimension = (self.view.frame.size.width - 2 * space) / 5.0
+            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE)
         }
         
-        flowLayout.minimumInteritemSpacing = space
-        flowLayout.minimumLineSpacing = space
-        flowLayout.itemSize = CGSizeMake(dimension, dimension)
+        return CGSizeMake(dimension, dimension)
+    }
+    
+    func memesForGroup(group: Int) -> [Meme] {
+        switch group {
+        case DateGroup.Latest.rawValue:
+            return memes
+        case DateGroup.Older.rawValue:
+            return olderMemes
+        default:
+            assert(false, "Unknown date group type")
+        }
     }
     
 }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol MemeEditorViewControllerDelegate {
+protocol MemeEditorViewDelegate {
     func didSendMeme(meme: Meme)
 }
 
@@ -27,14 +27,11 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
     
-    var delegate: MemeEditorViewControllerDelegate!
+    var delegate: MemeEditorViewDelegate!
     var meme: Meme!
 
-    private let fontNames: [String] = ["Impact", "IMPACTED", "Impacted 2.0", "New", "Thanatos", "Danger Diabolik"]
     private var currentFontIndex: Int!
-    private let foregroundColors: [String] = ["white", "red", "blue", "black"]
     private var currentForegroundColorIndex: Int!
-    private let strokeColors: [String] = ["black", "white", "red", "blue"]
     private var currentStrokeColorIndex: Int!
     
     // For animated instruction
@@ -98,27 +95,27 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         switch (sender.direction) {
             // Swipe left or right to change font
         case UISwipeGestureRecognizerDirection.Left:
-            currentFontIndex = (currentFontIndex + 1) % fontNames.count
+            currentFontIndex = (currentFontIndex + 1) % FontNames.count
             break
         case UISwipeGestureRecognizerDirection.Right:
-            currentFontIndex = (currentFontIndex + fontNames.count - 1) % fontNames.count // Add "fontNames.count" to avoid getting negative results
+            currentFontIndex = (currentFontIndex + FontNames.count - 1) % FontNames.count // Add "fontNames.count" to avoid getting negative results
             break
             
             // Swipe up to change foreground color
         case UISwipeGestureRecognizerDirection.Up:
-            currentForegroundColorIndex = (currentForegroundColorIndex + 1) % foregroundColors.count
+            currentForegroundColorIndex = (currentForegroundColorIndex + 1) % ForegroundColors.count
             break
             
             // Swipe down to change stroke color
         case UISwipeGestureRecognizerDirection.Down:
-            currentStrokeColorIndex = (currentStrokeColorIndex + 1) % strokeColors.count
+            currentStrokeColorIndex = (currentStrokeColorIndex + 1) % StrokeColors.count
             break
             
         default:
             break
         }
         
-        setTextAttributes(fontNames[currentFontIndex], foregroundColor: stringToColor(foregroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(strokeColors[currentStrokeColorIndex]))
+        setTextAttributes(FontNames[currentFontIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
         
         // Show instructions at the first launch
         if shouldShowInstructions! {
@@ -257,7 +254,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         currentForegroundColorIndex = 0
         currentStrokeColorIndex = 0
         
-        setTextAttributes(fontNames[currentFontIndex], foregroundColor: stringToColor(foregroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(strokeColors[currentStrokeColorIndex]))
+        setTextAttributes(FontNames[currentFontIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
     }
     
     func setTextAttributes(fontName: String, foregroundColor: UIColor, strokeColor: UIColor) {
