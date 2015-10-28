@@ -8,21 +8,38 @@
 
 import UIKit
 
-class SentMemesTableViewController: UITableViewController {
+class SentMemesTableViewController: UITableViewController, MemeEditorViewControllerDelegate {
     
     var memes: [Meme]!
+    var hasNewMemeToDisplay: Bool!
+    
+    func didSendMeme(meme: Meme) {
+        memes.append(meme)
+        hasNewMemeToDisplay = true
+    }
+    
+    @IBAction func createMeme(sender: UIBarButtonItem) {
+        let memeEditorVC = storyboard!.instantiateViewControllerWithIdentifier("MemeEditorViewController") as! MemeEditorViewController
+        memeEditorVC.delegate = self
+        
+        presentViewController(memeEditorVC, animated: true, completion: nil)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
+        hasNewMemeToDisplay = false
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
-        
-        tableView.reloadData()
+        // For better performance, insert new meme at the end
+        if hasNewMemeToDisplay! {
+            tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: tableView.numberOfRowsInSection(0), inSection: 0)], withRowAnimation: .Automatic)
+            hasNewMemeToDisplay = false
+        }
     }
     
     // MARK: Table View Data Source

@@ -257,7 +257,7 @@
                     <navigationItem key="navigationItem" title="Sent Memes" id="V5A-EA-anT">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="sUD-lB-kbD">
                             <connections>
-                                <segue destination="BYZ-38-t0r" kind="presentation" id="scQ-nY-TMx"/>
+                                <action selector="createMeme:" destination="WcV-Sk-5Xv" id="giz-FE-sUf"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -396,10 +396,13 @@
                     <navigationItem key="navigationItem" title="Sent Memes" id="Hdr-wD-MF6">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="T3c-Zy-Ve6">
                             <connections>
-                                <segue destination="BYZ-38-t0r" kind="presentation" id="3C1-3N-0mA"/>
+                                <action selector="createMeme:" destination="egS-cN-Jdx" id="7cQ-hP-QIA"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="flowLayout" destination="b9y-xq-Per" id="mrL-tN-Coo"/>
+                    </connections>
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Jq5-Ae-cbk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -432,8 +435,5 @@
         <image name="grid" width="24" height="24"/>
         <image name="list" width="25" height="25"/>
     </resources>
-    <inferredMetricsTieBreakers>
-        <segue reference="scQ-nY-TMx"/>
-    </inferredMetricsTieBreakers>
     <color key="tintColor" red="1" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
 </document>

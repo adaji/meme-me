@@ -8,8 +8,12 @@
 
 import UIKit
 
+protocol MemeEditorViewControllerDelegate {
+    func didSendMeme(meme: Meme)
+}
+
 class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
-        
+    
     @IBOutlet weak var memeView: UIView! // Contains image view and text fields
     
     @IBOutlet weak var imageView: UIImageView!
@@ -23,8 +27,9 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
     
+    var delegate: MemeEditorViewControllerDelegate!
     var meme: Meme!
-//    private var textAttributes: [String: String]!
+
     private let fontNames: [String] = ["Impact", "IMPACTED", "Impacted 2.0", "New", "Thanatos", "Danger Diabolik"]
     private var currentFontIndex: Int!
     private let foregroundColors: [String] = ["white", "red", "blue", "black"]
@@ -157,6 +162,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         let meme = Meme(sentDate: NSDate(), topText: topTextField.text!, bottomText: bottomTextField.text!, textAttributes: topTextField.defaultTextAttributes, originalImage: imageView.image!, memedImage: memedImage)
         
         (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
+        delegate.didSendMeme(meme)
         
         dismissViewControllerAnimated(true, completion: nil)
     }

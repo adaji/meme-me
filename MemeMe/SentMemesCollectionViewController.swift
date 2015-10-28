@@ -8,16 +8,62 @@
 
 import UIKit
 
-class SentMemesCollectionViewController: UICollectionViewController {
+class SentMemesCollectionViewController: UICollectionViewController, MemeEditorViewControllerDelegate {
+    
+    @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
     var memes: [Meme]!
+    
+    private let MINIMUM_SPACING: CGFloat = 3.0
+    private let NUMBER_OF_ITEMS_IN_PORTRAIT_LINE: Int = 3
+    private let NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE: Int = 5
+    
+    private var hasNewMemeToDisplay: Bool!
+    
+    func didSendMeme(meme: Meme) {
+        memes.append(meme)
+        hasNewMemeToDisplay = true
+    }
+    
+    @IBAction func createMeme(sender: UIBarButtonItem) {
+        let memeEditorVC = storyboard!.instantiateViewControllerWithIdentifier("MemeEditorViewController") as! MemeEditorViewController
+        memeEditorVC.delegate = self
+        
+        presentViewController(memeEditorVC, animated: true, completion: nil)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        flowLayout.minimumInteritemSpacing = MINIMUM_SPACING
+        flowLayout.minimumLineSpacing = MINIMUM_SPACING
+        
+        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
+        hasNewMemeToDisplay = false
+    }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
+        // For better performance, insert new meme at the end
+        if (hasNewMemeToDisplay!) {
+            collectionView!.insertItemsAtIndexPaths([NSIndexPath(forItem: collectionView!.numberOfItemsInSection(0), inSection: 0)])
+            hasNewMemeToDisplay = false
+        }
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
         
-        collectionView!.reloadData()
+        // Adjust item size when rotates
+        var dimension: CGFloat
+        if UIDeviceOrientationIsPortrait(UIDevice.currentDevice().orientation) {
+            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_IN_PORTRAIT_LINE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_IN_PORTRAIT_LINE)
+        }
+        else {
+            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE)
+        }
+        flowLayout.itemSize = CGSizeMake(dimension, dimension)
     }
     
     // MARK: Collection View Data Source
@@ -60,8 +106,33 @@ class SentMemesCollectionViewController: UICollectionViewController {
         detailVC.meme = memes[indexPath.row]
         navigationController!.pushViewController(detailVC, animated: true)
     }
-
+    
+    // Adjust item size when screen rotates
+    func screenDidRotate() {
+        let space: CGFloat = 3.0
+        var dimension: CGFloat
+        if UIDeviceOrientationIsPortrait(UIDevice.currentDevice().orientation) {
+            dimension = (self.view.frame.size.width - 2 * space) / 3.0
+        }
+        else {
+            dimension = (self.view.frame.size.width - 2 * space) / 5.0
+        }
+        
+        flowLayout.minimumInteritemSpacing = space
+        flowLayout.minimumLineSpacing = space
+        flowLayout.itemSize = CGSizeMake(dimension, dimension)
+    }
+    
 }
+
+
+
+
+
+
+
+
+
 
 
 
