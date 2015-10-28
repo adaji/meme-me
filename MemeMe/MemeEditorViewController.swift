@@ -8,8 +8,12 @@
 
 import UIKit
 
+protocol MemeEditorViewDelegate {
+    func didSendMeme(meme: Meme)
+}
+
 class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
-        
+    
     @IBOutlet weak var memeView: UIView! // Contains image view and text fields
     
     @IBOutlet weak var imageView: UIImageView!
@@ -23,11 +27,11 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
     
-    private let fontNames: [String] = ["Impact", "IMPACTED", "Impacted 2.0", "New", "Thanatos", "Danger Diabolik"]
-    private var currentFontIndex: Int!
-    private let foregroundColors: [String] = ["white", "red", "blue", "black"]
+    var delegate: MemeEditorViewDelegate?
+    var meme: Meme?
+
+    private var currentFontNameIndex: Int!
     private var currentForegroundColorIndex: Int!
-    private let strokeColors: [String] = ["black", "white", "red", "blue"]
     private var currentStrokeColorIndex: Int!
     
     // For animated instruction
@@ -45,7 +49,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         topTextField.delegate = self
         bottomTextField.delegate = self
         
-        setEditorViewToDefault()
+        setupEditorView()
         
         addGestureRecognizers()
     }
@@ -91,27 +95,27 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         switch (sender.direction) {
             // Swipe left or right to change font
         case UISwipeGestureRecognizerDirection.Left:
-            currentFontIndex = (currentFontIndex + 1) % fontNames.count
+            currentFontNameIndex = (currentFontNameIndex + 1) % FontNames.count
             break
         case UISwipeGestureRecognizerDirection.Right:
-            currentFontIndex = (currentFontIndex + fontNames.count - 1) % fontNames.count // Add "fontNames.count" to avoid getting negative results
+            currentFontNameIndex = (currentFontNameIndex + FontNames.count - 1) % FontNames.count // Add "fontNames.count" to avoid getting negative results
             break
             
             // Swipe up to change foreground color
         case UISwipeGestureRecognizerDirection.Up:
-            currentForegroundColorIndex = (currentForegroundColorIndex + 1) % foregroundColors.count
+            currentForegroundColorIndex = (currentForegroundColorIndex + 1) % ForegroundColors.count
             break
             
             // Swipe down to change stroke color
         case UISwipeGestureRecognizerDirection.Down:
-            currentStrokeColorIndex = (currentStrokeColorIndex + 1) % strokeColors.count
+            currentStrokeColorIndex = (currentStrokeColorIndex + 1) % StrokeColors.count
             break
             
         default:
             break
         }
         
-        setTextAttributes(fontNames[currentFontIndex], foregroundColor: colorForString(foregroundColors[currentForegroundColorIndex]), strokeColor: colorForString(strokeColors[currentStrokeColorIndex]))
+        setTextAttributes(FontNames[currentFontNameIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
         
         // Show instructions at the first launch
         if shouldShowInstructions! {
@@ -130,7 +134,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             (activity, success, items, error) in
             if success {
                 self.saveMeme(memedImage)
-                self.dismissViewControllerAnimated(true, completion: nil)
             }
         }
         presentViewController(activityVC, animated: true, completion: nil)
@@ -153,13 +156,16 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     func saveMeme(memedImage: UIImage) {
-        let meme = Meme(topText: topTextField.text!, bottomText: bottomTextField.text!, image: imageView.image!, memedImage: memedImage)
+        let meme = Meme(sentDate: NSDate(), topText: topTextField.text!, bottomText: bottomTextField.text!, textAttributes: topTextField.defaultTextAttributes, originalImage: imageView.image!, memedImage: memedImage)
         
         (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
+        delegate?.didSendMeme(meme)
+        
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     @IBAction func cancelEditing(sender: UIBarButtonItem) {
-        setEditorViewToDefault()
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     // MARK: Gestures
@@ -211,14 +217,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         return true
     }
     
-    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
-        if (string != "") {
-            cancelButton.enabled = true
-        }
-        
-        return true
-    }
-    
     // MARK: UIImagePickerControllerDelegate
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
@@ -228,7 +226,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             imageView.image = image
             
             shareButton.enabled = true
-            cancelButton.enabled = true
         }
     }
     
@@ -236,79 +233,61 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: Helper methods
+    // MARK: Editor View
     
-    // Return to launch state, displaying no image and default text
-    func setEditorViewToDefault() {
-        shareButton.enabled = false
-        cancelButton.enabled = false
-        
-        currentFontIndex = 0
-        currentForegroundColorIndex = 0
-        currentStrokeColorIndex = 0
-        
-        imageView.image = nil
-        setTextFieldsToDefault()
-    }
-    
-    // Set text and text attributes to default
-    func setTextFieldsToDefault() {
-        topTextField.text = "TOP"
-        bottomTextField.text = "BOTTOM"
-        
-        setTextAttributes(fontNames[currentFontIndex], foregroundColor: colorForString(foregroundColors[currentForegroundColorIndex]), strokeColor: colorForString(strokeColors[currentStrokeColorIndex]))
+    func setupEditorView() {
+        // Create new meme
+        if meme == nil {
+            shareButton.enabled = false
+            
+            imageView.image = nil
+            
+            // Set text and text attributes to default
+            
+            topTextField.text = "TOP"
+            bottomTextField.text = "BOTTOM"
+            
+            currentFontNameIndex = 0
+            currentForegroundColorIndex = 0
+            currentStrokeColorIndex = 0
+            
+            setTextAttributes(FontNames[currentFontNameIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
+        }
+            // Edit existing meme
+        else {
+            shareButton.enabled = true
+            
+            imageView.image = meme!.originalImage
+            
+            topTextField.text = meme!.topText
+            bottomTextField.text = meme!.bottomText
+            
+            let textAttributes = meme!.textAttributes
+            currentFontNameIndex = FontNames.indexOf(textAttributes[NSFontAttributeName]!.fontName)
+            currentForegroundColorIndex = ForegroundColors.indexOf(colorToString(textAttributes[NSForegroundColorAttributeName] as! UIColor))
+            currentStrokeColorIndex = StrokeColors.indexOf(colorToString(textAttributes[NSStrokeColorAttributeName] as! UIColor))
+            setTextAttributesWithDictionary(textAttributes)
+        }
     }
     
     func setTextAttributes(fontName: String, foregroundColor: UIColor, strokeColor: UIColor) {
-        // Set default text attributes
-        let memeTextAttributes = [
+        let textAttributes = [
             NSStrokeColorAttributeName : strokeColor,
             NSForegroundColorAttributeName : foregroundColor,
             NSFontAttributeName : UIFont(name: fontName, size: 40)!,
-            NSStrokeWidthAttributeName : -3 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
+            NSStrokeWidthAttributeName : -4 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
         ]
-        topTextField.defaultTextAttributes = memeTextAttributes
-        bottomTextField.defaultTextAttributes = memeTextAttributes
+
+        setTextAttributesWithDictionary(textAttributes)
+    }
+    
+    func setTextAttributesWithDictionary(textAttributes: [String: AnyObject]) {
+        topTextField.defaultTextAttributes = textAttributes
+        bottomTextField.defaultTextAttributes = textAttributes
         
         // Set text alignment after setting default text attributes
         topTextField.textAlignment = .Center
         bottomTextField.textAlignment = .Center
-    }
-    
-    func colorForString(colorName: String) -> UIColor {
-        switch colorName {
-        case "white":
-            return UIColor.whiteColor()
-        case "black":
-            return UIColor.blackColor()
-        case "red":
-            return UIColor.redColor()
-        case "blue":
-            return UIColor.blueColor()
-        default:
-            return UIColor.clearColor()
-        }
-    }
-    
-    // Set label text and adjust label frame to the center
-    func updateInstructionLabel(label: UILabel, text: String) {
-        label.text = text
-        
-        // Reset label frame to center
-        label.sizeToFit()
-        label.center = view.center
-    }
-    
-    func enableSwipes(enabled: Bool, horizontal: Bool) {
-        if let gestures = self.view.gestureRecognizers {
-            for gesture in gestures {
-                if let swipe = gesture as? UISwipeGestureRecognizer {
-                    if (horizontal && (swipe.direction == .Left || swipe.direction == .Right)) || (swipe.direction == .Up || swipe.direction == .Down) {
-                        swipe.enabled = enabled
-                    }
-                }
-            }
-        }
     }
     
     // MARK: Notifications
@@ -316,14 +295,15 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     func subscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "screenDidRotate", name: UIDeviceOrientationDidChangeNotification, object: nil)
     }
     
     func unsubscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
 
-    // MARK: Adjust view frame when keyboard shows/hides
+    // MARK: Keyboard
+    
+    // Adjust view frame when keyboard shows/hides
     
     func keyboardWillShow(notification: NSNotification) {
         if (bottomTextField.isFirstResponder()) {
@@ -349,7 +329,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     // Dismiss keyboard and adjust view frame when screen rotates
-    func screenDidRotate() {
+    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         if (bottomTextField.isFirstResponder()) {
             bottomTextField.resignFirstResponder()
         }
@@ -432,6 +412,27 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
                 }
             }
         )
+    }
+    
+    // Set label text and adjust label frame to the center
+    func updateInstructionLabel(label: UILabel, text: String) {
+        label.text = text
+        
+        // Reset label frame to center
+        label.sizeToFit()
+        label.center = view.center
+    }
+    
+    func enableSwipes(enabled: Bool, horizontal: Bool) {
+        if let gestures = self.view.gestureRecognizers {
+            for gesture in gestures {
+                if let swipe = gesture as? UISwipeGestureRecognizer {
+                    if (horizontal && (swipe.direction == .Left || swipe.direction == .Right)) || (swipe.direction == .Up || swipe.direction == .Down) {
+                        swipe.enabled = enabled
+                    }
+                }
+            }
+        }
     }
     
 }
