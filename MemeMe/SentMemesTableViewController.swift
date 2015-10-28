@@ -8,49 +8,46 @@
 
 import UIKit
 
-class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegate {
+class SentMemesTableViewController: UITableViewController {
     
     // Display latest items at the top
-    private var reversedLatestMemes: [Meme]!
-    private let reversedOlderMemes: [Meme] = Meme.olderMemes.reverse()
+    private var memes: [Meme]!
+    private let localMemes: [Meme] = Meme.localMemes
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tableView.userInteractionEnabled = true
+    }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        reversedLatestMemes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes.reverse()
+        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
 
         // For better performance, only update view(s) for new meme(s)
-        let section = ReverseDateGroup.Latest.rawValue
+        let section = ReversedMemeGroup.Mine.rawValue
         let rowsCount = tableView.numberOfRowsInSection(section)
-        if rowsCount < reversedLatestMemes.count {
+        if rowsCount < memes.count {
             var indexPaths = [NSIndexPath]()
             var row = 0
-            for _ in rowsCount...(reversedLatestMemes.count - 1) {
+            for _ in rowsCount...(memes.count - 1) {
                 indexPaths.append(NSIndexPath(forRow: row, inSection: section))
                 row++
             }
             tableView.insertRowsAtIndexPaths(indexPaths, withRowAnimation: .Automatic)
-            tableView.headerViewForSection(section)?.textLabel?.text = ReverseDateGroups[section] + " (" + String(memesForGroup(section).count) + ")"
+            tableView.headerViewForSection(section)?.textLabel?.text = ReversedMemeGroups[section] + " (" + String(memesForGroup(section).count) + ")"
         }
-    }
-    
-    // MARK: Actions
-    
-    @IBAction func createMeme(sender: UIBarButtonItem) {
-        let memeEditorVC = storyboard!.instantiateViewControllerWithIdentifier("MemeEditorViewController") as! MemeEditorViewController
-        memeEditorVC.delegate = self
-        
-        presentViewController(memeEditorVC, animated: true, completion: nil)
     }
     
     // MARK: Table View Data Source
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return ReverseDateGroups.count
+        return ReversedMemeGroups.count
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return ReverseDateGroups[section] + " (" + String(memesForGroup(section).count) + ")"
+        return ReversedMemeGroups[section] + " (" + String(memesForGroup(section).count) + ")"
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -60,7 +57,7 @@ class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegat
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeTableViewCell")! as! MemeTableViewCell
         let memes = memesForGroup(indexPath.section)
-        let meme = memes[indexPath.row]
+        let meme = memes[memes.count - 1 - indexPath.row]
         
         
         cell.setMeme(meme.originalImage, topText: meme.topText, bottomText: meme.bottomText, textAttributes: meme.textAttributes, sentDate: stringFromDate(meme.sentDate))
@@ -79,24 +76,53 @@ class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegat
         
         let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
         let memes = memesForGroup(indexPath.section)
-        detailVC.meme = memes[indexPath.row]
+        detailVC.meme = memes[memes.count - 1 - indexPath.row]
         
         navigationController!.pushViewController(detailVC, animated: true)
     }
     
-    // MARK: Meme Editor View Delegate
+    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        switch indexPath.section {
+        case ReversedMemeGroup.Mine.rawValue:
+            return true
+        case ReversedMemeGroup.Web.rawValue:
+            return false
+        default:
+            assert(false, "Unexpected section")
+        }
+    }
     
-    func didSendMeme(meme: Meme) {
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        let section = indexPath.section
+        switch section {
+        case ReversedMemeGroup.Mine.rawValue:
+            switch editingStyle {
+            case .Delete:
+                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+                appDelegate.memes.removeAtIndex(memes.count - 1 - indexPath.row)
+                memes = appDelegate.memes
+                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+                tableView.headerViewForSection(section)?.textLabel?.text = ReversedMemeGroups[section] + " (" + String(memesForGroup(section).count) + ")"
+                
+                appDelegate.shouldReloadCollectionView = true
+                
+                break
+            default:
+                break
+            }
+        default:
+            assert(false, "Unexpected section")
+        }
     }
     
     // MARK: Helper Methods
     
     func memesForGroup(group: Int) -> [Meme] {
         switch group {
-        case ReverseDateGroup.Latest.rawValue:
-            return reversedLatestMemes
-        case ReverseDateGroup.Older.rawValue:
-            return reversedOlderMemes
+        case ReversedMemeGroup.Mine.rawValue:
+            return memes
+        case ReversedMemeGroup.Web.rawValue:
+            return localMemes
         default:
             assert(false, "Unknown date group type")
         }

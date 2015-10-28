@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MemeDetailViewController: UIViewController {
+class MemeDetailViewController: UIViewController, MemeEditorViewDelegate {
 
     @IBOutlet weak var imageView: UIImageView!
     
@@ -20,7 +20,6 @@ class MemeDetailViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .Plain, target: self, action: "editMeme")
         tabBarController?.tabBar.hidden = true
         
-        imageView.contentMode = .ScaleAspectFit
         imageView.image = meme.memedImage
     }
     
@@ -32,8 +31,15 @@ class MemeDetailViewController: UIViewController {
     
     func editMeme() {
         let editorVC = storyboard!.instantiateViewControllerWithIdentifier("MemeEditorViewController") as! MemeEditorViewController
+        editorVC.delegate = self
         editorVC.meme = meme
         presentViewController(editorVC, animated: true, completion: nil)
+    }
+    
+    // MARK: Meme Editor View Delegate
+    
+    func didSendMeme(meme: Meme) {
+        self.meme = meme
     }
     
 }

@@ -22,7 +22,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="tsO-iz-M4e">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="tsO-iz-M4e">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                             </imageView>
                         </subviews>
@@ -79,8 +79,8 @@
                                     <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8l5-Lu-QpT">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="512"/>
                                     </imageView>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="pY0-ZR-Tni">
-                                        <rect key="frame" x="20" y="438" width="560" height="50"/>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="18" translatesAutoresizingMaskIntoConstraints="NO" id="pY0-ZR-Tni">
+                                        <rect key="frame" x="8" y="438" width="584" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="sqH-qL-yQQ"/>
                                         </constraints>
@@ -88,8 +88,8 @@
                                         <fontDescription key="fontDescription" name="Impact" family="Impact" pointSize="40"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="allCharacters"/>
                                     </textField>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="20" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
-                                        <rect key="frame" x="20" y="20" width="560" height="50"/>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="18" translatesAutoresizingMaskIntoConstraints="NO" id="Jlg-Hq-ME1">
+                                        <rect key="frame" x="8" y="20" width="584" height="50"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="jxG-dW-UeD"/>
                                         </constraints>
@@ -109,7 +109,7 @@
                                     <constraint firstItem="pY0-ZR-Tni" firstAttribute="trailing" secondItem="Jlg-Hq-ME1" secondAttribute="trailing" id="afd-Qb-OCx"/>
                                     <constraint firstItem="8l5-Lu-QpT" firstAttribute="leading" secondItem="8HI-11-Oxg" secondAttribute="leading" id="bky-i7-EZE"/>
                                     <constraint firstItem="Jlg-Hq-ME1" firstAttribute="top" secondItem="8HI-11-Oxg" secondAttribute="top" constant="20" id="eQT-qv-LsZ"/>
-                                    <constraint firstItem="pY0-ZR-Tni" firstAttribute="leading" secondItem="8HI-11-Oxg" secondAttribute="leading" constant="20" id="nfL-aR-drw"/>
+                                    <constraint firstItem="pY0-ZR-Tni" firstAttribute="leading" secondItem="8HI-11-Oxg" secondAttribute="leading" constant="8" id="nfL-aR-drw"/>
                                 </constraints>
                             </view>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ywu-Vv-Mag">
@@ -208,7 +208,7 @@
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="80" id="EMa-Ve-6Wg"/>
                                             </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -257,7 +257,7 @@
                     <navigationItem key="navigationItem" title="Sent Memes" id="V5A-EA-anT">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="sUD-lB-kbD">
                             <connections>
-                                <action selector="createMeme:" destination="WcV-Sk-5Xv" id="giz-FE-sUf"/>
+                                <segue destination="BYZ-38-t0r" kind="presentation" identifier="CreateMeme" id="EbY-bh-Wil"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -374,7 +374,7 @@
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GNX-Ln-ebQ">
                                     <rect key="frame" x="16" y="4" width="569" height="20.5"/>
                                     <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
-                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                             </subviews>
@@ -396,7 +396,7 @@
                     <navigationItem key="navigationItem" title="Sent Memes" id="Hdr-wD-MF6">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="T3c-Zy-Ve6">
                             <connections>
-                                <action selector="createMeme:" destination="egS-cN-Jdx" id="7cQ-hP-QIA"/>
+                                <segue destination="BYZ-38-t0r" kind="presentation" identifier="CreateMeme" id="kJ9-zN-7iR"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -435,5 +435,8 @@
         <image name="grid" width="24" height="24"/>
         <image name="list" width="25" height="25"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="EbY-bh-Wil"/>
+    </inferredMetricsTieBreakers>
     <color key="tintColor" red="1" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
 </document>

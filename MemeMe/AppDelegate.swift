@@ -13,12 +13,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    var numberOfDays = 0
-    var days = []
     var memes = [Meme]()
+    var shouldReloadCollectionView: Bool! // Reload collection view if user deletes item(s) from table view
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         application.statusBarHidden = true
+        (window?.rootViewController as! UITabBarController).tabBar.tintColor = UIColor.orangeColor()
         
         // Update user defaults to remember app has launched (more than) once
         let userDefaults = NSUserDefaults.standardUserDefaults()
@@ -33,6 +33,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             userDefaults.setObject(false, forKey: hasLauchedBeforeKey)
             userDefaults.synchronize()
         }
+        
+        shouldReloadCollectionView = false
         
         return true
     }

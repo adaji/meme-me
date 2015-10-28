@@ -27,10 +27,10 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
     
-    var delegate: MemeEditorViewDelegate!
-    var meme: Meme!
+    var delegate: MemeEditorViewDelegate?
+    var meme: Meme?
 
-    private var currentFontIndex: Int!
+    private var currentFontNameIndex: Int!
     private var currentForegroundColorIndex: Int!
     private var currentStrokeColorIndex: Int!
     
@@ -49,7 +49,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         topTextField.delegate = self
         bottomTextField.delegate = self
         
-        setEditorViewToDefault()
+        setupEditorView()
         
         addGestureRecognizers()
     }
@@ -95,10 +95,10 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         switch (sender.direction) {
             // Swipe left or right to change font
         case UISwipeGestureRecognizerDirection.Left:
-            currentFontIndex = (currentFontIndex + 1) % FontNames.count
+            currentFontNameIndex = (currentFontNameIndex + 1) % FontNames.count
             break
         case UISwipeGestureRecognizerDirection.Right:
-            currentFontIndex = (currentFontIndex + FontNames.count - 1) % FontNames.count // Add "fontNames.count" to avoid getting negative results
+            currentFontNameIndex = (currentFontNameIndex + FontNames.count - 1) % FontNames.count // Add "fontNames.count" to avoid getting negative results
             break
             
             // Swipe up to change foreground color
@@ -115,7 +115,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             break
         }
         
-        setTextAttributes(FontNames[currentFontIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
+        setTextAttributes(FontNames[currentFontNameIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
         
         // Show instructions at the first launch
         if shouldShowInstructions! {
@@ -159,14 +159,12 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         let meme = Meme(sentDate: NSDate(), topText: topTextField.text!, bottomText: bottomTextField.text!, textAttributes: topTextField.defaultTextAttributes, originalImage: imageView.image!, memedImage: memedImage)
         
         (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
-        delegate.didSendMeme(meme)
+        delegate?.didSendMeme(meme)
         
         dismissViewControllerAnimated(true, completion: nil)
     }
     
     @IBAction func cancelEditing(sender: UIBarButtonItem) {
-        setEditorViewToDefault()
-        
         dismissViewControllerAnimated(true, completion: nil)
     }
     
@@ -235,26 +233,41 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: Helper methods
+    // MARK: Editor View
     
-    // Return to launch state, displaying no image and default text
-    func setEditorViewToDefault() {
-        shareButton.enabled = false
-        
-        imageView.image = nil
-        setTextFieldsToDefault()
-    }
-    
-    // Set text and text attributes to default
-    func setTextFieldsToDefault() {
-        topTextField.text = "TOP"
-        bottomTextField.text = "BOTTOM"
-        
-        currentFontIndex = 0
-        currentForegroundColorIndex = 0
-        currentStrokeColorIndex = 0
-        
-        setTextAttributes(FontNames[currentFontIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
+    func setupEditorView() {
+        // Create new meme
+        if meme == nil {
+            shareButton.enabled = false
+            
+            imageView.image = nil
+            
+            // Set text and text attributes to default
+            
+            topTextField.text = "TOP"
+            bottomTextField.text = "BOTTOM"
+            
+            currentFontNameIndex = 0
+            currentForegroundColorIndex = 0
+            currentStrokeColorIndex = 0
+            
+            setTextAttributes(FontNames[currentFontNameIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
+        }
+            // Edit existing meme
+        else {
+            shareButton.enabled = true
+            
+            imageView.image = meme!.originalImage
+            
+            topTextField.text = meme!.topText
+            bottomTextField.text = meme!.bottomText
+            
+            let textAttributes = meme!.textAttributes
+            currentFontNameIndex = FontNames.indexOf(textAttributes[NSFontAttributeName]!.fontName)
+            currentForegroundColorIndex = ForegroundColors.indexOf(colorToString(textAttributes[NSForegroundColorAttributeName] as! UIColor))
+            currentStrokeColorIndex = StrokeColors.indexOf(colorToString(textAttributes[NSStrokeColorAttributeName] as! UIColor))
+            setTextAttributesWithDictionary(textAttributes)
+        }
     }
     
     func setTextAttributes(fontName: String, foregroundColor: UIColor, strokeColor: UIColor) {
@@ -264,33 +277,17 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             NSFontAttributeName : UIFont(name: fontName, size: 40)!,
             NSStrokeWidthAttributeName : -4 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
         ]
+
+        setTextAttributesWithDictionary(textAttributes)
+    }
+    
+    func setTextAttributesWithDictionary(textAttributes: [String: AnyObject]) {
         topTextField.defaultTextAttributes = textAttributes
         bottomTextField.defaultTextAttributes = textAttributes
         
         // Set text alignment after setting default text attributes
         topTextField.textAlignment = .Center
         bottomTextField.textAlignment = .Center
-    }
-    
-    // Set label text and adjust label frame to the center
-    func updateInstructionLabel(label: UILabel, text: String) {
-        label.text = text
-        
-        // Reset label frame to center
-        label.sizeToFit()
-        label.center = view.center
-    }
-    
-    func enableSwipes(enabled: Bool, horizontal: Bool) {
-        if let gestures = self.view.gestureRecognizers {
-            for gesture in gestures {
-                if let swipe = gesture as? UISwipeGestureRecognizer {
-                    if (horizontal && (swipe.direction == .Left || swipe.direction == .Right)) || (swipe.direction == .Up || swipe.direction == .Down) {
-                        swipe.enabled = enabled
-                    }
-                }
-            }
-        }
     }
     
     // MARK: Notifications
@@ -414,6 +411,27 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
                 }
             }
         )
+    }
+    
+    // Set label text and adjust label frame to the center
+    func updateInstructionLabel(label: UILabel, text: String) {
+        label.text = text
+        
+        // Reset label frame to center
+        label.sizeToFit()
+        label.center = view.center
+    }
+    
+    func enableSwipes(enabled: Bool, horizontal: Bool) {
+        if let gestures = self.view.gestureRecognizers {
+            for gesture in gestures {
+                if let swipe = gesture as? UISwipeGestureRecognizer {
+                    if (horizontal && (swipe.direction == .Left || swipe.direction == .Right)) || (swipe.direction == .Up || swipe.direction == .Down) {
+                        swipe.enabled = enabled
+                    }
+                }
+            }
+        }
     }
     
 }

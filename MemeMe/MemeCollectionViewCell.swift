@@ -19,7 +19,9 @@ class MemeCollectionViewCell: UICollectionViewCell {
 
         let attributes = textAttributesWithFontSize(textAttributes, size: 14)
         topLabel.attributedText = NSAttributedString(string: topText, attributes: attributes)
+        topLabel.lineBreakMode = .ByTruncatingMiddle
         bottomLabel.attributedText = NSAttributedString(string: bottomText, attributes: attributes)
+        bottomLabel.lineBreakMode = .ByTruncatingMiddle
     }
     
 }

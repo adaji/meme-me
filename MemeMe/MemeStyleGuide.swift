@@ -22,20 +22,20 @@ func textAttributesWithFontSize(attributes: [String: AnyObject], size: CGFloat) 
     return textAttributes
 }
 
-// Dates
+// Meme Group
 
-enum DateGroup: Int {
-    case Older = 0
-    case Latest
+enum MemeGroup: Int {
+    case Web = 0
+    case Mine
 }
 
-enum ReverseDateGroup: Int {
-    case Latest = 0
-    case Older
+enum ReversedMemeGroup: Int {
+    case Mine = 0
+    case Web
 }
 
-let DateGroups = ["Older", "Latest"]
-let ReverseDateGroups = ["Latest", "Older"]
+let MemeGroups = ["Funny Memes From Web", "My Memes"]
+let ReversedMemeGroups = ["My Memes", "Funny Memes From Web"]
 
 // Date format
 // Today: time only, e.g. "10:30"
@@ -79,7 +79,7 @@ func stringToColor(colorName: String) -> UIColor {
     case "blue":
         return UIColor.blueColor()
     default:
-        assert(false, "Unknown color")
+        assert(false, "Unexpected color")
     }
 }
 
@@ -94,7 +94,7 @@ func colorToString(color: UIColor) -> String {
     case UIColor.blueColor():
         return "blue"
     default:
-        assert(false, "Unknown color")
+        assert(false, "Unexpected color")
     }
 }
 
