@@ -35,8 +35,7 @@ class SentMemesTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeTableViewCell")! as! MemeTableViewCell
         let meme = memes[indexPath.row]
         
-        cell.setMemeImage(meme.image)
-        cell.setText(meme.top, bottom: meme.bottom, attributes: meme.attributes, time: "10:30")
+        cell.setMeme(meme.image, top: meme.top, bottom: meme.bottom, attributes: meme.attributes, time: "10:30")
         
         return cell
     }
