@@ -30,7 +30,7 @@ extension Meme {
         
         var memes = [Meme]()
         let imageNames = ["1", "2", "3", "4"]
-        let nDaysAgoArray: [Int] = [1, 2, 5, 10]
+        let nDaysAgoArray: [Int] = [10, 5, 2, 1]
         var i: Int = 0
         for imageName: String in imageNames {
             let meme = Meme(sentDate: NSDate(timeInterval: Double(-1 * nDaysAgoArray[i] * 24 * 60 * 60), sinceDate: NSDate()), topText: "TOP", bottomText: "BOTTOM", textAttributes: DefaultTextAttributes, originalImage: UIImage(named: imageName)!, memedImage: UIImage(named: imageName)!)

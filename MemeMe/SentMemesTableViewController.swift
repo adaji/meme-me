@@ -10,23 +10,27 @@ import UIKit
 
 class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegate {
     
-    private var memes: [Meme]!
-    private let olderMemes: [Meme] = Meme.olderMemes
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-    }
+    // Display latest items at the top
+    private var reversedLatestMemes: [Meme]!
+    private let reversedOlderMemes: [Meme] = Meme.olderMemes.reverse()
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
+        reversedLatestMemes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes.reverse()
 
-        // For better performance, insert new meme at the end
-        let nRows = tableView.numberOfRowsInSection(DateGroup.Latest.rawValue)
-        if nRows < memes.count {
-            tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: nRows, inSection: DateGroup.Latest.rawValue)], withRowAnimation: .Automatic)
+        // For better performance, only update view(s) for new meme(s)
+        let section = ReverseDateGroup.Latest.rawValue
+        let rowsCount = tableView.numberOfRowsInSection(section)
+        if rowsCount < reversedLatestMemes.count {
+            var indexPaths = [NSIndexPath]()
+            var row = 0
+            for _ in rowsCount...(reversedLatestMemes.count - 1) {
+                indexPaths.append(NSIndexPath(forRow: row, inSection: section))
+                row++
+            }
+            tableView.insertRowsAtIndexPaths(indexPaths, withRowAnimation: .Automatic)
+            tableView.headerViewForSection(section)?.textLabel?.text = ReverseDateGroups[section] + " (" + String(memesForGroup(section).count) + ")"
         }
     }
     
@@ -42,11 +46,11 @@ class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegat
     // MARK: Table View Data Source
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return DateGroups.count
+        return ReverseDateGroups.count
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return DateGroups[section]
+        return ReverseDateGroups[section] + " (" + String(memesForGroup(section).count) + ")"
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -55,7 +59,9 @@ class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegat
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeTableViewCell")! as! MemeTableViewCell
-        let meme = memesForGroup(indexPath.section)[indexPath.row]
+        let memes = memesForGroup(indexPath.section)
+        let meme = memes[indexPath.row]
+        
         
         cell.setMeme(meme.originalImage, topText: meme.topText, bottomText: meme.bottomText, textAttributes: meme.textAttributes, sentDate: stringFromDate(meme.sentDate))
         
@@ -72,7 +78,8 @@ class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegat
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         
         let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        detailVC.meme = memesForGroup(indexPath.section)[indexPath.row]
+        let memes = memesForGroup(indexPath.section)
+        detailVC.meme = memes[indexPath.row]
         
         navigationController!.pushViewController(detailVC, animated: true)
     }
@@ -86,10 +93,10 @@ class SentMemesTableViewController: UITableViewController, MemeEditorViewDelegat
     
     func memesForGroup(group: Int) -> [Meme] {
         switch group {
-        case DateGroup.Latest.rawValue:
-            return memes
-        case DateGroup.Older.rawValue:
-            return olderMemes
+        case ReverseDateGroup.Latest.rawValue:
+            return reversedLatestMemes
+        case ReverseDateGroup.Older.rawValue:
+            return reversedOlderMemes
         default:
             assert(false, "Unknown date group type")
         }

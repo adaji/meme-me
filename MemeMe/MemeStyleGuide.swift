@@ -25,11 +25,17 @@ func textAttributesWithFontSize(attributes: [String: AnyObject], size: CGFloat) 
 // Dates
 
 enum DateGroup: Int {
+    case Older = 0
+    case Latest
+}
+
+enum ReverseDateGroup: Int {
     case Latest = 0
     case Older
 }
 
-let DateGroups = ["Latest", "Older"]
+let DateGroups = ["Older", "Latest"]
+let ReverseDateGroups = ["Latest", "Older"]
 
 // Date format
 // Today: time only, e.g. "10:30"

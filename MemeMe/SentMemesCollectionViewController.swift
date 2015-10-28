@@ -12,12 +12,13 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
     
-    var memes: [Meme]!
+    // Display oldest items at the top
     private let olderMemes: [Meme] = Meme.olderMemes
+    private var latestMemes: [Meme]!
     
     private let MINIMUM_SPACING: CGFloat = 3.0
-    private let NUMBER_OF_ITEMS_IN_PORTRAIT_LINE: Int = 3
-    private let NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE: Int = 5
+    private let NUMBER_OF_ITEMS_PER_LINE_PORTRAIT: Int = 3
+    private let NUMBER_OF_ITEMS_PER_LINE_LANDSCAPE: Int = 5
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,12 +31,19 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
+        latestMemes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
         
-        // For better performance, insert new meme at the end
-        let nItems = collectionView!.numberOfItemsInSection(DateGroup.Latest.rawValue)
-        if nItems < memes.count {
-            collectionView!.insertItemsAtIndexPaths([NSIndexPath(forItem: nItems, inSection: DateGroup.Latest.rawValue)])
+        // For better performance, only update view(s) for new meme(s)
+        let section = DateGroup.Latest.rawValue
+        let itemsCount = collectionView!.numberOfItemsInSection(section)
+        if itemsCount < latestMemes.count {
+            var indexPaths = [NSIndexPath]()
+            for item in itemsCount...(latestMemes.count - 1) {
+                indexPaths.append(NSIndexPath(forItem: item, inSection: section))
+            }
+            collectionView!.insertItemsAtIndexPaths(indexPaths)
+            let headerView = collectionView?.supplementaryViewForElementKind(UICollectionElementKindSectionHeader, atIndexPath: NSIndexPath(forItem: 0, inSection: section)) as! MemeCollectionHeaderView
+            headerView.titleLabel.text = DateGroups[section] + " (" + String(memesForGroup(section).count) + ")"
         }
     }
     
@@ -61,11 +69,12 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
         return DateGroups.count
     }
     
+    // Section header view
     override func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionElementKindSectionHeader:
             let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MemeCollectionHeaderView", forIndexPath: indexPath) as! MemeCollectionHeaderView
-            headerView.titleLabel.text = DateGroups[indexPath.section]
+            headerView.titleLabel.text = DateGroups[indexPath.section] + " (" + String(memesForGroup(indexPath.section).count) + ")"
             
             return headerView
             
@@ -75,12 +84,13 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
     }
     
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == 0 ? memes.count : olderMemes.count
+        return memesForGroup(section).count
     }
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionViewCell", forIndexPath: indexPath) as! MemeCollectionViewCell
-        let meme = memesForGroup(indexPath.section)[indexPath.row]
+        let memes = memesForGroup(indexPath.section)
+        let meme = memes[indexPath.row]
         cell.setMeme(meme.originalImage, topText: meme.topText, bottomText: meme.bottomText, textAttributes: meme.textAttributes)
         
         return cell
@@ -107,10 +117,10 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
     func itemSize() -> CGSize {
         var dimension: CGFloat
         if UIDeviceOrientationIsPortrait(UIDevice.currentDevice().orientation) {
-            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_IN_PORTRAIT_LINE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_IN_PORTRAIT_LINE)
+            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_PER_LINE_PORTRAIT - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_PER_LINE_PORTRAIT)
         }
         else {
-            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_IN_LANDSCAPE_LINE)
+            dimension = (self.view.frame.size.width - CGFloat(NUMBER_OF_ITEMS_PER_LINE_LANDSCAPE - 1) * MINIMUM_SPACING) / CGFloat(NUMBER_OF_ITEMS_PER_LINE_LANDSCAPE)
         }
         
         return CGSizeMake(dimension, dimension)
@@ -119,7 +129,7 @@ class SentMemesCollectionViewController: UICollectionViewController, MemeEditorV
     func memesForGroup(group: Int) -> [Meme] {
         switch group {
         case DateGroup.Latest.rawValue:
-            return memes
+            return latestMemes
         case DateGroup.Older.rawValue:
             return olderMemes
         default:
