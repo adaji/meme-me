@@ -295,14 +295,15 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     func subscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "screenDidRotate", name: UIDeviceOrientationDidChangeNotification, object: nil)
     }
     
     func unsubscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
 
-    // MARK: Adjust view frame when keyboard shows/hides
+    // MARK: Keyboard
+    
+    // Adjust view frame when keyboard shows/hides
     
     func keyboardWillShow(notification: NSNotification) {
         if (bottomTextField.isFirstResponder()) {
@@ -328,7 +329,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     // Dismiss keyboard and adjust view frame when screen rotates
-    func screenDidRotate() {
+    override func willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation, duration: NSTimeInterval) {
         if (bottomTextField.isFirstResponder()) {
             bottomTextField.resignFirstResponder()
         }
