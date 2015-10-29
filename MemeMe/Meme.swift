@@ -21,13 +21,6 @@ struct Meme {
 extension Meme {
     // Generate an array of local memes
     static var localMemes: [Meme] {
-        let DefaultTextAttributes: [String: AnyObject] = [
-            NSStrokeColorAttributeName : UIColor.blackColor(),
-            NSForegroundColorAttributeName : UIColor.whiteColor(),
-            NSFontAttributeName : UIFont(name: "Impact", size: 40)!,
-            NSStrokeWidthAttributeName : -4 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
-        ]
-        
         let SentDateKey = "SentDateKey"
         let TopTextKey = "TopTextKey"
         let BottomTextKey = "BottomTextKey"
