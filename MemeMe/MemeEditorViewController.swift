@@ -69,7 +69,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         unsubscribeToKeyboardNotifications()
     }
     
-    // MARK: Edit meme image
+    // MARK: Edit Meme
     
     @IBAction func pickImageFromAlbum(sender: UIBarButtonItem) {
         presentImagePicker(UIImagePickerControllerSourceType.PhotoLibrary)
@@ -87,10 +87,12 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         presentViewController(imagePicker, animated: true, completion: nil)
     }
     
-    // MARK: Swipe to change font or text color
-    
+    // Change font or text color by swiping
+    //
+    // Swipe left or right to change font
+    // Swipe up to change foreground color
+    // Swipe down to change stroke color
     func changeTextAttribute(sender: UISwipeGestureRecognizer) {
-        // Dismiss instructions
         
         switch (sender.direction) {
             // Swipe left or right to change font
@@ -125,7 +127,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         }
     }
     
-    // MARK: Share/save meme
+    // MARK: Share/Save Meme
     
     @IBAction func shareMeme(sender: UIBarButtonItem) {
         let memedImage = generateMemedImage()
@@ -139,18 +141,81 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         presentViewController(activityVC, animated: true, completion: nil)
     }
     
+    // This method generates memed image by taking snapshot of the image area
+    //
+    // It handles conditions that the image does not fill the image view vertically
+    // so that generated image does not have margins on its top and bottom.
+    // However, generated image may still have margins on its left and right.
+    //
+    // TODO: Remove left and right margins of generated image
+    // To do this, you also need to constrain text fields' frames to be in the image area
+    // to avoid text being cut off by the edges.
     func generateMemedImage() -> UIImage {
-        // Change meme view background color to white
+        
+        // Change to snapshot settings
+        
+        topBar.hidden = true
+        bottomBar.hidden = true
+        
         memeView.backgroundColor = UIColor.whiteColor()
         
-        // Render view to an image
-        UIGraphicsBeginImageContext(memeView.frame.size)
-        memeView.drawViewHierarchyInRect(CGRect(origin: CGPoint(x: 0, y: 0), size: memeView.frame.size), afterScreenUpdates: true)
-        let memedImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()
+        let imageViewSize = imageView.frame.size
+        let imageViewWidth = imageViewSize.width
+        let imageViewHeight = imageViewSize.height
+        let imageViewRatio = imageViewWidth / imageViewHeight
+        
+        let imageSize = imageView.image!.size
+        let imageWidth = imageSize.width
+        let imageHeight = imageSize.height
+        let imageRatio = imageWidth / imageHeight
+        
+        let topFrame = topTextField.frame
+        let bottomFrame = bottomTextField.frame
+
+        var memedImage: UIImage
+        // image display width = image view width
+        if imageRatio >= imageViewRatio {
+            let imageDisplayWidth = imageViewWidth
+            let imageDisplayHeight = imageDisplayWidth / imageWidth * imageHeight - 2.0 // - 2.0 to get rid of the white lines on the top and bottom edges of the generated image
+            let imageDisplayY = (imageViewHeight - imageDisplayHeight) / 2.0
+            let imageDisplaySize = CGSizeMake(imageDisplayWidth, imageDisplayHeight)
+            
+            var topFrame_temp = topFrame
+            topFrame_temp.origin.y = imageDisplayY + 20
+            topTextField.frame = topFrame_temp
+            var bottomFrame_temp = bottomFrame
+            bottomFrame_temp.origin.y = imageView.frame.size.height - imageDisplayY - bottomFrame_temp.size.height - 20
+            bottomTextField.frame = bottomFrame_temp
+
+            // Render view to an image
+            UIGraphicsBeginImageContext(imageDisplaySize)
+            memeView.drawViewHierarchyInRect(CGRect(origin: CGPoint(x: 0, y: -imageDisplayY), size: memeView.frame.size), afterScreenUpdates: true)
+        }
+            // image display height = image view height
+        else {
+            var topFrame_temp = topFrame
+            topFrame_temp.origin.y = 20
+            topTextField.frame = topFrame_temp
+            var bottomFrame_temp = bottomFrame
+            bottomFrame_temp.origin.y = imageView.frame.size.height - bottomFrame_temp.size.height - 20
+            bottomTextField.frame = bottomFrame_temp
+            
+            // Render view to an image
+            UIGraphicsBeginImageContext(memeView.frame.size)
+            memeView.drawViewHierarchyInRect(CGRect(origin: CGPoint(x: 0, y: 0), size: memeView.frame.size), afterScreenUpdates: true)
+        }
+        memedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        // Change meme view background color back
+        // Change back to editor settings
+        
+        topBar.hidden = false
+        bottomBar.hidden = false
+
         memeView.backgroundColor = UIColor.darkGrayColor()
+        
+        topTextField.frame = topFrame
+        bottomTextField.frame = bottomFrame
         
         return memedImage
     }
