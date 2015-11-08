@@ -8,11 +8,15 @@
 
 import UIKit
 
+// MARK: Protocols
+
 protocol MemeEditorViewDelegate {
     func didSendMeme(meme: Meme)
 }
 
 class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
+    
+    // MARK: Properties
     
     @IBOutlet weak var memeView: UIView! // Contains image view and text fields
     
@@ -43,6 +47,10 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     private let VerticalSwipeInstruction: String = "Good job.\nNow swipe up ↑ to change text color\nor\nswipe down ↓ to change stroke color"
     private let DEFAULT_DELAY_TIME: Double = 3 // Unit: second
     
+    var tapRecognizer: UITapGestureRecognizer? = nil
+    
+    // MARK: Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -52,6 +60,9 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         setupEditorView()
         
         addGestureRecognizers()
+        
+        tapRecognizer = UITapGestureRecognizer(target: self, action: "handleSingleTap:")
+        tapRecognizer?.numberOfTapsRequired = 1
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -59,12 +70,16 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         
         cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
         
+        addKeyboardDismissRecognizer()
+        
         // Subscribe to the keyboard notifications, to allow the view to adjust frame when necessary
         subscribeToKeyboardNotifications()
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        removeKeyboardDismissRecognizer()
         
         unsubscribeToKeyboardNotifications()
     }
@@ -233,7 +248,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: Gestures
+    // MARK: Swipe
     
     func addGestureRecognizers() {
         for direction: UISwipeGestureRecognizerDirection in [.Left, .Right, .Up, .Down] {
@@ -272,7 +287,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
                 textField.text = "BOTTOM"
             }
         }
-        
+
         return true
     }
     
@@ -355,7 +370,21 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         bottomTextField.textAlignment = .Center
     }
     
-    // MARK: Notifications
+    // MARK: Show/Hide Keyboard
+    
+    // Adjust view frame when keyboard shows/hides
+    
+    func addKeyboardDismissRecognizer() {
+        view.addGestureRecognizer(tapRecognizer!)
+    }
+    
+    func removeKeyboardDismissRecognizer() {
+        view.removeGestureRecognizer(tapRecognizer!)
+    }
+    
+    func handleSingleTap(recognizer: UITapGestureRecognizer) {
+        view.endEditing(true)
+    }
     
     func subscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
@@ -365,26 +394,21 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     func unsubscribeToKeyboardNotifications() {
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
-
-    // MARK: Keyboard
-    
-    // Adjust view frame when keyboard shows/hides
     
     func keyboardWillShow(notification: NSNotification) {
         if (bottomTextField.isFirstResponder()) {
-            moveViewVertically(getKeyboardHeight(notification), up: true)
+            if view.frame.origin.y == 0.0 {
+                view.frame.origin.y -= getKeyboardHeight(notification)
+            }
         }
     }
     
     func keyboardWillHide(notification: NSNotification) {
         if (bottomTextField.isFirstResponder()) {
-            moveViewVertically(getKeyboardHeight(notification), up: false)
+            if view.frame.origin.y != 0.0 {
+                view.frame.origin.y += getKeyboardHeight(notification)
+            }
         }
-    }
-    
-    func moveViewVertically(distance: CGFloat, up: Bool) {
-        let dist = distance * (up ? -1 : 1)
-        view.frame.origin.y += dist
     }
     
     func getKeyboardHeight(notification: NSNotification) -> CGFloat {
