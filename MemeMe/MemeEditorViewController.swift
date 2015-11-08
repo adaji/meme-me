@@ -47,6 +47,10 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     private let VerticalSwipeInstruction: String = "Good job.\nNow swipe up ↑ to change text color\nor\nswipe down ↓ to change stroke color"
     private let DEFAULT_DELAY_TIME: Double = 3 // Unit: second
     
+    var upSwipeRecognizer: UISwipeGestureRecognizer? = nil
+    var downSwipeRecognizer: UISwipeGestureRecognizer? = nil
+    var leftSwipeRecognizer: UISwipeGestureRecognizer? = nil
+    var rightSwipeRecognizer: UISwipeGestureRecognizer? = nil
     var tapRecognizer: UITapGestureRecognizer? = nil
     
     // MARK: Life Cycle
@@ -59,10 +63,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         
         setupEditorView()
         
-        addGestureRecognizers()
-        
-        tapRecognizer = UITapGestureRecognizer(target: self, action: "handleSingleTap:")
-        tapRecognizer?.numberOfTapsRequired = 1
+        setupGestureRecognizers()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -70,6 +71,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         
         cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
         
+        addTextAttributesChangeRecognizers()
         addKeyboardDismissRecognizer()
         
         // Subscribe to the keyboard notifications, to allow the view to adjust frame when necessary
@@ -79,12 +81,13 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         
+        removeTextAttributesChangeRecognizers()
         removeKeyboardDismissRecognizer()
         
         unsubscribeToKeyboardNotifications()
     }
     
-    // MARK: Edit Meme
+    // MARK: Edit Meme Image
     
     @IBAction func pickImageFromAlbum(sender: UIBarButtonItem) {
         presentImagePicker(UIImagePickerControllerSourceType.PhotoLibrary)
@@ -102,12 +105,26 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         presentViewController(imagePicker, animated: true, completion: nil)
     }
     
+    // MARK: Edit Meme Text Attributes
+    
+    func addTextAttributesChangeRecognizers() {
+        for recognizer: UIGestureRecognizer in [upSwipeRecognizer!, downSwipeRecognizer!, leftSwipeRecognizer!, rightSwipeRecognizer!] {
+            view.addGestureRecognizer(recognizer)
+        }
+    }
+    
+    func removeTextAttributesChangeRecognizers() {
+        for recognizer: UIGestureRecognizer in [upSwipeRecognizer!, downSwipeRecognizer!, leftSwipeRecognizer!, rightSwipeRecognizer!] {
+            view.removeGestureRecognizer(recognizer)
+        }
+    }
+    
     // Change font or text color by swiping
     //
     // Swipe left or right to change font
     // Swipe up to change foreground color
     // Swipe down to change stroke color
-    func changeTextAttribute(sender: UISwipeGestureRecognizer) {
+    func handleSwipe(sender: UISwipeGestureRecognizer) {
         
         switch (sender.direction) {
             // Swipe left or right to change font
@@ -248,25 +265,20 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: Swipe
+    // MARK: UIImagePickerControllerDelegate
     
-    func addGestureRecognizers() {
-        for direction: UISwipeGestureRecognizerDirection in [.Left, .Right, .Up, .Down] {
-            addSwipeRecognizer(direction)
-        }
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        dismissViewControllerAnimated(true, completion: nil)
         
-        // Show instructions at the first launch
-        shouldShowInstructions = !NSUserDefaults.standardUserDefaults().boolForKey("HasLaunchedBefore")
-        if shouldShowInstructions! {
-            showInstructions()
+        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            imageView.image = image
+            
+            shareButton.enabled = true
         }
     }
     
-    func addSwipeRecognizer(direction: UISwipeGestureRecognizerDirection) {
-        // Swipe right or left to change font
-        let swipe = UISwipeGestureRecognizer(target: self, action: "changeTextAttribute:")
-        swipe.direction = direction
-        view.addGestureRecognizer(swipe)
+    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     // MARK: UITextFieldDelegate
@@ -297,23 +309,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         return true
     }
     
-    // MARK: UIImagePickerControllerDelegate
-    
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        dismissViewControllerAnimated(true, completion: nil)
-        
-        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            imageView.image = image
-            
-            shareButton.enabled = true
-        }
-    }
-    
-    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    // MARK: Editor View
+    // MARK: Set Up View
     
     func setupEditorView() {
         // Create new meme
@@ -350,24 +346,25 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         }
     }
     
-    func setTextAttributes(fontName: String, foregroundColor: UIColor, strokeColor: UIColor) {
-        let textAttributes = [
-            NSStrokeColorAttributeName : strokeColor,
-            NSForegroundColorAttributeName : foregroundColor,
-            NSFontAttributeName : UIFont(name: fontName, size: 40)!,
-            NSStrokeWidthAttributeName : -4 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
-        ]
-
-        setTextAttributesWithDictionary(textAttributes)
-    }
-    
-    func setTextAttributesWithDictionary(textAttributes: [String: AnyObject]) {
-        topTextField.defaultTextAttributes = textAttributes
-        bottomTextField.defaultTextAttributes = textAttributes
+    func setupGestureRecognizers() {
+        // Swipe right or left to change font
+        upSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: "handleSwipe:")
+        upSwipeRecognizer?.direction = .Up
+        downSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: "handleSwipe:")
+        downSwipeRecognizer?.direction = .Down
+        leftSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: "handleSwipe:")
+        leftSwipeRecognizer?.direction = .Left
+        rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: "handleSwipe:")
+        rightSwipeRecognizer?.direction = .Right
         
-        // Set text alignment after setting default text attributes
-        topTextField.textAlignment = .Center
-        bottomTextField.textAlignment = .Center
+        // Show instructions at the first launch
+        shouldShowInstructions = !NSUserDefaults.standardUserDefaults().boolForKey("HasLaunchedBefore")
+        if shouldShowInstructions! {
+            showInstructions()
+        }
+        
+        tapRecognizer = UITapGestureRecognizer(target: self, action: "handleSingleTap:")
+        tapRecognizer?.numberOfTapsRequired = 1
     }
     
     // MARK: Show/Hide Keyboard
@@ -424,7 +421,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         }
     }
     
-    // MARK: Animated instructions
+    // MARK: Animated Instructions
     
     func showInstructions() {
         hasShownInstructionForHorizontalSwipe = false
@@ -522,6 +519,28 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
                 }
             }
         }
+    }
+    
+    // MARK: Helper Functions
+    
+    func setTextAttributes(fontName: String, foregroundColor: UIColor, strokeColor: UIColor) {
+        let textAttributes = [
+            NSStrokeColorAttributeName : strokeColor,
+            NSForegroundColorAttributeName : foregroundColor,
+            NSFontAttributeName : UIFont(name: fontName, size: 40)!,
+            NSStrokeWidthAttributeName : -4 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
+        ]
+        
+        setTextAttributesWithDictionary(textAttributes)
+    }
+    
+    func setTextAttributesWithDictionary(textAttributes: [String: AnyObject]) {
+        topTextField.defaultTextAttributes = textAttributes
+        bottomTextField.defaultTextAttributes = textAttributes
+        
+        // Set text alignment after setting default text attributes
+        topTextField.textAlignment = .Center
+        bottomTextField.textAlignment = .Center
     }
     
 }
