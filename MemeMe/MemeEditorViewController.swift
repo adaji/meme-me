@@ -8,11 +8,13 @@
 
 import UIKit
 
-// MARK: Protocols
+// MARK: - Protocols
 
 protocol MemeEditorViewDelegate {
     func didSendMeme(meme: Meme)
 }
+
+// MARK: - Meme Editor View Controller
 
 class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
     
@@ -265,7 +267,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: UIImagePickerControllerDelegate
+    // MARK: Image Picker Controller Delegate
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         dismissViewControllerAnimated(true, completion: nil)
@@ -281,7 +283,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         dismissViewControllerAnimated(true, completion: nil)
     }
     
-    // MARK: UITextFieldDelegate
+    // MARK: Text Field Delegate
     
     func textFieldDidBeginEditing(textField: UITextField) {
         if (textField.text == "TOP" || textField.text == "BOTTOM") {
@@ -309,7 +311,7 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
         return true
     }
     
-    // MARK: Set Up View
+    // MARK: View Setup
     
     func setupEditorView() {
         // Create new meme
@@ -368,8 +370,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     }
     
     // MARK: Show/Hide Keyboard
-    
-    // Adjust view frame when keyboard shows/hides
     
     func addKeyboardDismissRecognizer() {
         view.addGestureRecognizer(tapRecognizer!)
