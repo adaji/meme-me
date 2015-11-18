@@ -16,7 +16,7 @@ protocol MemeEditorViewDelegate {
 
 // MARK: - Meme Editor View Controller
 
-class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
+class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITextFieldDelegate {
     
     // MARK: Properties
     
@@ -53,7 +53,6 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
     var downSwipeRecognizer: UISwipeGestureRecognizer? = nil
     var leftSwipeRecognizer: UISwipeGestureRecognizer? = nil
     var rightSwipeRecognizer: UISwipeGestureRecognizer? = nil
-    var tapRecognizer: UITapGestureRecognizer? = nil
     
     // MARK: Life Cycle
     
@@ -365,53 +364,16 @@ class MemeEditorViewController: UIViewController, UIImagePickerControllerDelegat
             showInstructions()
         }
         
-        tapRecognizer = UITapGestureRecognizer(target: self, action: "handleSingleTap:")
-        tapRecognizer?.numberOfTapsRequired = 1
     }
     
     // MARK: Show/Hide Keyboard
     
-    func addKeyboardDismissRecognizer() {
-        view.addGestureRecognizer(tapRecognizer!)
-    }
-    
-    func removeKeyboardDismissRecognizer() {
-        view.removeGestureRecognizer(tapRecognizer!)
-    }
-    
-    func handleSingleTap(recognizer: UITapGestureRecognizer) {
-        view.endEditing(true)
-    }
-    
-    func subscribeToKeyboardNotifications() {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
-    }
-    
-    func unsubscribeToKeyboardNotifications() {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-    }
-    
-    func keyboardWillShow(notification: NSNotification) {
-        if (bottomTextField.isFirstResponder()) {
-            if view.frame.origin.y == 0.0 {
-                view.frame.origin.y -= getKeyboardHeight(notification)
-            }
+    override func keyboardWillShow(notification: NSNotification) {
+        if !keyboardAdjusted && bottomTextField.isFirstResponder() {
+            lastKeyboardOffset = getKeyboardHeight(notification)
+            view.superview?.frame.origin.y -= lastKeyboardOffset
+            keyboardAdjusted = true
         }
-    }
-    
-    func keyboardWillHide(notification: NSNotification) {
-        if (bottomTextField.isFirstResponder()) {
-            if view.frame.origin.y != 0.0 {
-                view.frame.origin.y += getKeyboardHeight(notification)
-            }
-        }
-    }
-    
-    func getKeyboardHeight(notification: NSNotification) -> CGFloat {
-        let userInfo = notification.userInfo
-        let keyboardSize = userInfo![UIKeyboardFrameEndUserInfoKey] as! NSValue // of CGRect
-        return keyboardSize.CGRectValue().height
     }
     
     // Dismiss keyboard and adjust view frame when screen rotates
