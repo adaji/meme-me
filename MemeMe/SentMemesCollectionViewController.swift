@@ -99,9 +99,26 @@ class SentMemesCollectionViewController: UICollectionViewController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         collectionView.deselectItemAtIndexPath(indexPath, animated: true)
         
-        let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        detailVC.meme = memesForGroup(indexPath.section)[indexPath.row]
-        navigationController!.pushViewController(detailVC, animated: true)
+//        let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
+//        detailVC.meme = memesForGroup(indexPath.section)[indexPath.row]
+//        navigationController!.pushViewController(detailVC, animated: true)
+    }
+    
+    // MARK: Navigation
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let identifier = segue.identifier {
+            switch identifier {
+            case "ShowMemeDetail":
+                if let detailVC = segue.destinationViewController as? MemeDetailViewController {
+                    let memes = memesForGroup((collectionView?.indexPathsForSelectedItems()![0].section)!)
+                    detailVC.meme = memes[(collectionView?.indexPathsForSelectedItems()![0].row)!]
+                }
+                return
+            default:
+                return
+            }
+        }
     }
     
     // MARK: Helper Methods

@@ -40,7 +40,7 @@ class SentMemesTableViewController: UITableViewController {
         }
     }
     
-    // MARK: Table View Data Source
+    // MARK: UITableViewDataSource
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return ReversedMemeGroups.count
@@ -69,16 +69,10 @@ class SentMemesTableViewController: UITableViewController {
         return 100
     }
     
-    // MARK: Table View Delegate
+    // MARK: UITableViewDelegate
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
-        
-        let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        let memes = memesForGroup(indexPath.section)
-        detailVC.meme = memes[memes.count - 1 - indexPath.row]
-        
-        navigationController!.pushViewController(detailVC, animated: true)
     }
     
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
@@ -112,6 +106,23 @@ class SentMemesTableViewController: UITableViewController {
             }
         default:
             assert(false, "Unexpected section")
+        }
+    }
+    
+    // MARK: Navigation
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let identifier = segue.identifier {
+            switch identifier {
+            case "ShowMemeDetail":
+                if let detailVC = segue.destinationViewController as? MemeDetailViewController {
+                    let memes = memesForGroup(tableView.indexPathForSelectedRow!.section)
+                    detailVC.meme = memes[memes.count - 1 - tableView.indexPathForSelectedRow!.row]
+                }
+                return
+            default:
+                return
+            }
         }
     }
     
