@@ -40,7 +40,7 @@ class SentMemesTableViewController: UITableViewController {
         }
     }
     
-    // MARK: Table View Data Source
+    // MARK: UITableViewDataSource
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return ReversedMemeGroups.count
@@ -69,7 +69,7 @@ class SentMemesTableViewController: UITableViewController {
         return 100
     }
     
-    // MARK: Table View Delegate
+    // MARK: UITableViewDelegate
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)

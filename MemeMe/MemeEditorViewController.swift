@@ -10,7 +10,7 @@ import UIKit
 
 // MARK: - Protocols
 
-protocol MemeEditorViewDelegate {
+protocol MemeEditorViewControllerDelegate {
     func didSendMeme(meme: Meme)
 }
 
@@ -33,7 +33,7 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
     
-    var delegate: MemeEditorViewDelegate?
+    var delegate: MemeEditorViewControllerDelegate?
     var meme: Meme?
 
     private var currentFontNameIndex: Int!

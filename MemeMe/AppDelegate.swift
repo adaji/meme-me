@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         application.statusBarHidden = true
-        (window?.rootViewController as! UITabBarController).tabBar.tintColor = UIColor.orangeColor()
+        (window?.rootViewController as! UITabBarController).tabBar.tintColor = UIColor.orangeColor() // Change tab bar tint color to orange
         
         // Update user defaults to remember app has launched (more than) once
         let userDefaults = NSUserDefaults.standardUserDefaults()

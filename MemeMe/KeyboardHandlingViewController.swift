@@ -39,6 +39,7 @@ class KeyboardHandlingViewController: UIViewController {
         removeKeyboardDismissRecognizer()
         unsubscribeToKeyboardNotifications()
     }
+    
     // MARK: Show/Hide Keyboard
     
     func addKeyboardDismissRecognizer() {
