@@ -37,7 +37,7 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
     var meme: Meme?
 
     private var currentFontNameIndex: Int!
-    private var currentForegroundColorIndex: Int!
+    private var currentTextColorIndex: Int!
     private var currentStrokeColorIndex: Int!
     
     // For animated instruction
@@ -130,27 +130,27 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
         switch (sender.direction) {
             // Swipe left or right to change font
         case UISwipeGestureRecognizerDirection.Left:
-            currentFontNameIndex = (currentFontNameIndex + 1) % FontNames.count
+            currentFontNameIndex = (currentFontNameIndex + 1) % Meme.TextAttributes.FontNames.count
             break
         case UISwipeGestureRecognizerDirection.Right:
-            currentFontNameIndex = (currentFontNameIndex + FontNames.count - 1) % FontNames.count // Add "fontNames.count" to avoid getting negative results
+            currentFontNameIndex = (currentFontNameIndex + Meme.TextAttributes.FontNames.count - 1) % Meme.TextAttributes.FontNames.count // Add "fontNames.count" to avoid getting negative results
             break
             
             // Swipe up to change foreground color
         case UISwipeGestureRecognizerDirection.Up:
-            currentForegroundColorIndex = (currentForegroundColorIndex + 1) % ForegroundColors.count
+            currentTextColorIndex = (currentTextColorIndex + 1) % Meme.TextAttributes.TextColorStrings.count
             break
             
             // Swipe down to change stroke color
         case UISwipeGestureRecognizerDirection.Down:
-            currentStrokeColorIndex = (currentStrokeColorIndex + 1) % StrokeColors.count
+            currentStrokeColorIndex = (currentStrokeColorIndex + 1) % Meme.TextAttributes.StrokeColorStrings.count
             break
             
         default:
             break
         }
         
-        setTextAttributes(FontNames[currentFontNameIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
+        configureTextFields()
         
         // Show instructions at the first launch
         if shouldShowInstructions! {
@@ -168,7 +168,37 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
         activityVC.completionWithItemsHandler = {
             (activity, success, items, error) in
             if success {
-                self.saveMeme(memedImage)
+                let sentDate = NSDate()
+                
+                let dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
+                let originalImagePath = NSURL.fileURLWithPathComponents([dirPath, sentDate.description + ".jpg"])!.path!
+                let memedImagePath = NSURL.fileURLWithPathComponents([dirPath, sentDate.description + "-memed.jpg"])!.path!
+                
+                let dictionary: [String: AnyObject] = [
+                    Meme.Keys.SentDate: sentDate,
+                    Meme.Keys.TextAttributesDictionary: Meme.textAttributesDictionary(self.topTextField.defaultTextAttributes),
+                    Meme.Keys.TopText: self.topTextField.text!,
+                    Meme.Keys.BottomText: self.bottomTextField.text!,
+                    Meme.Keys.OriginalImagePath: originalImagePath,
+                    Meme.Keys.MemedImagePath: memedImagePath
+                ]
+
+                let meme = Meme(dictionary: dictionary)
+                (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
+                self.delegate?.didSendMeme(meme)
+                
+                self.dismissViewControllerAnimated(true, completion: nil)
+
+                if UIImageJPEGRepresentation(self.imageView.image!, 1.0)!.writeToFile(originalImagePath, atomically: false) {
+                    print("Original image saved")
+                } else {
+                    print("Unable to save original image")
+                }
+                if UIImageJPEGRepresentation(memedImage, 1.0)!.writeToFile(memedImagePath, atomically: false) {
+                    print("Memed image saved")
+                } else {
+                    print("Unable to save memed image")
+                }
             }
         }
         presentViewController(activityVC, animated: true, completion: nil)
@@ -253,15 +283,6 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
         return memedImage
     }
     
-    func saveMeme(memedImage: UIImage) {
-        let meme = Meme(sentDate: NSDate(), topText: topTextField.text!, bottomText: bottomTextField.text!, textAttributes: topTextField.defaultTextAttributes, originalImage: imageView.image!, memedImage: memedImage)
-        
-        (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
-        delegate?.didSendMeme(meme)
-        
-        dismissViewControllerAnimated(true, completion: nil)
-    }
-    
     @IBAction func cancelEditing(sender: UIBarButtonItem) {
         dismissViewControllerAnimated(true, completion: nil)
     }
@@ -325,25 +346,25 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
             bottomTextField.text = "BOTTOM"
             
             currentFontNameIndex = 0
-            currentForegroundColorIndex = 0
+            currentTextColorIndex = 0
             currentStrokeColorIndex = 0
             
-            setTextAttributes(FontNames[currentFontNameIndex], foregroundColor: stringToColor(ForegroundColors[currentForegroundColorIndex]), strokeColor: stringToColor(StrokeColors[currentStrokeColorIndex]))
+            configureTextFields()
         }
             // Edit existing meme
         else {
             shareButton.enabled = true
             
-            imageView.image = meme!.originalImage
+            imageView.image = UIImage(contentsOfFile: meme!.originalImagePath)
             
             topTextField.text = meme!.topText
             bottomTextField.text = meme!.bottomText
             
-            let textAttributes = meme!.textAttributes
-            currentFontNameIndex = FontNames.indexOf(textAttributes[NSFontAttributeName]!.fontName)
-            currentForegroundColorIndex = ForegroundColors.indexOf(colorToString(textAttributes[NSForegroundColorAttributeName] as! UIColor))
-            currentStrokeColorIndex = StrokeColors.indexOf(colorToString(textAttributes[NSStrokeColorAttributeName] as! UIColor))
-            setTextAttributesWithDictionary(textAttributes)
+            currentFontNameIndex = Meme.TextAttributes.FontNames.indexOf(meme!.fontName)
+            currentTextColorIndex = Meme.TextAttributes.TextColorStrings.indexOf(meme!.textColorString)
+            currentStrokeColorIndex = Meme.TextAttributes.StrokeColorStrings.indexOf(meme!.strokeColorString)
+            
+            configureTextFields(Meme.textAttributesForMeme(meme!))
         }
     }
     
@@ -485,18 +506,13 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
     
     // MARK: Helper Functions
     
-    func setTextAttributes(fontName: String, foregroundColor: UIColor, strokeColor: UIColor) {
-        let textAttributes = [
-            NSStrokeColorAttributeName : strokeColor,
-            NSForegroundColorAttributeName : foregroundColor,
-            NSFontAttributeName : UIFont(name: fontName, size: 40)!,
-            NSStrokeWidthAttributeName : -4 // A negative value means both fill and stroke, 0 means only fill, a positive value means only stroke
-        ]
+    func configureTextFields() {
+        let textAttributes: [String: AnyObject] = Meme.textAttributes(Meme.TextAttributes.FontNames[currentFontNameIndex], textColorString: Meme.TextAttributes.TextColorStrings[currentTextColorIndex], strokeColorString: Meme.TextAttributes.StrokeColorStrings[currentStrokeColorIndex])
         
-        setTextAttributesWithDictionary(textAttributes)
+        configureTextFields(textAttributes)
     }
     
-    func setTextAttributesWithDictionary(textAttributes: [String: AnyObject]) {
+    func configureTextFields(textAttributes: [String: AnyObject]) {
         topTextField.defaultTextAttributes = textAttributes
         bottomTextField.defaultTextAttributes = textAttributes
         
@@ -506,3 +522,12 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
     }
     
 }
+
+
+
+
+
+
+
+
+

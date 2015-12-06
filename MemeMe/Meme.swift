@@ -9,62 +9,136 @@
 import Foundation
 import UIKit
 
-struct Meme {
-    var sentDate: NSDate
-    var topText: String
-    var bottomText: String
-    var textAttributes: [String: AnyObject]
-    var originalImage: UIImage
-    var memedImage: UIImage
+// MARK: - Meme: NSObject
+
+class Meme: NSObject {
+    
+    // MARK: Keys
+    
+    struct Keys {
+        static let SentDate = "sentDate"
+        static let TextAttributesDictionary = "textAttributesDictionary"
+        static let FontName = "fontName"
+        static let TextColorString = "textColorString"
+        static let StrokeColorString = "strokeColorString"
+        static let TopText = "topText"
+        static let BottomText = "bottomText"
+        static let OriginalImagePath = "originalImagePath"
+        static let MemedImagePath = "memedImagePath"
+    }
+    
+    // MARK: Properties
+    
+    var sentDate = NSDate()
+    var fontName = ""
+    var textColorString = ""
+    var strokeColorString = ""
+    var topText = ""
+    var bottomText = ""
+    var originalImagePath = ""
+    var memedImagePath = ""
+    
+    // MARK: Initializers
+    
+    init(dictionary: [String: AnyObject]) {
+        sentDate = dictionary[Keys.SentDate] as! NSDate
+        let textAttributesDictionary = dictionary[Keys.TextAttributesDictionary] as! [String: AnyObject]
+        fontName = textAttributesDictionary[Keys.FontName] as! String
+        textColorString = textAttributesDictionary[Keys.TextColorString] as! String
+        strokeColorString = textAttributesDictionary[Keys.StrokeColorString] as! String
+        topText = dictionary[Keys.TopText] as! String
+        bottomText = dictionary[Keys.BottomText] as! String
+        originalImagePath = dictionary[Keys.OriginalImagePath] as! String
+        memedImagePath = dictionary[Keys.MemedImagePath] as! String
+    }
+    
 }
 
+// MARK: - Meme (Local Memes)
+
 extension Meme {
+    
     // Generate an array of local memes
     static var localMemes: [Meme] {
-        let SentDateKey = "SentDateKey"
-        let TopTextKey = "TopTextKey"
-        let BottomTextKey = "BottomTextKey"
-        let TextAttributesKey = "TextAttributesKey"
-        let OriginalImageKey = "OriginalImageKey"
-        let MemedImageKey = "MemedImageKey"
-        
+
         let memeDictionaries: [[String: AnyObject]] = [
-            [SentDateKey: 10, TopTextKey: "I changed all my passwords to \"incorrect\"", BottomTextKey: "So whenever I forget, it will tell me \"Your password is incorrect\"", TextAttributesKey: [
-                NSFontAttributeName : UIFont(name: "IMPACTED", size: 40)!,
-                NSForegroundColorAttributeName : UIColor.redColor(),
-                NSStrokeColorAttributeName : UIColor.blackColor(),
-                NSStrokeWidthAttributeName : -4
-                ], OriginalImageKey: "funnyGuy", MemedImageKey: "funnyGuy_memed"],
-            [SentDateKey: 5, TopTextKey: "Don't you think that if I were wrong,", BottomTextKey: "I'd know it?", TextAttributesKey: [
-                NSFontAttributeName : UIFont(name: "Impact", size: 40)!,
-                NSForegroundColorAttributeName : UIColor.whiteColor(),
-                NSStrokeColorAttributeName : UIColor.blackColor(),
-                NSStrokeWidthAttributeName : -4
-                ], OriginalImageKey: "sheldon", MemedImageKey: "sheldon_memed"],
-            [SentDateKey: 2, TopTextKey: "Day 37:", BottomTextKey: "They still do not suspect I am a mere cat.", TextAttributesKey: [
-                NSFontAttributeName : UIFont(name: "IMPACTED", size: 40)!,
-                NSForegroundColorAttributeName : UIColor.blackColor(),
-                NSStrokeColorAttributeName : UIColor.whiteColor(),
-                NSStrokeWidthAttributeName : -4
-                ], OriginalImageKey: "cat", MemedImageKey: "cat_memed"],
-            [SentDateKey: 1, TopTextKey: "Homework due at midnight...", BottomTextKey: "Got everything turned in at 11:59 pm", TextAttributesKey: [
-                NSFontAttributeName : UIFont(name: "Impact", size: 40)!,
-                NSForegroundColorAttributeName : UIColor.blueColor(),
-                NSStrokeColorAttributeName : UIColor.whiteColor(),
-                NSStrokeWidthAttributeName : -4
-                ], OriginalImageKey: "successKid", MemedImageKey: "successKid_memed"]
+            [Keys.SentDate: Meme.dateByAddingDays(-10),
+                Keys.TopText: "I changed all my passwords to \"incorrect\"",
+                Keys.BottomText: "So whenever I forget, it will tell me \"Your password is incorrect\"",
+                Keys.TextAttributesDictionary: [
+                    Keys.FontName : "IMPACTED",
+                    Keys.TextColorString : "red",
+                    Keys.StrokeColorString : "black",
+                ],
+                Keys.OriginalImagePath: Meme.saveImageWithName("funnyGuy") ?? "",
+                Keys.MemedImagePath: Meme.saveImageWithName("funnyGuy_memed") ?? ""],
+            [Keys.SentDate: Meme.dateByAddingDays(-5),
+                Keys.TopText: "Don't you think that if I were wrong,",
+                Keys.BottomText: "I'd know it?",
+                Keys.TextAttributesDictionary: [
+                    Keys.FontName : "Impact",
+                    Keys.TextColorString : "white",
+                    Keys.StrokeColorString : "black",
+                ],
+                Keys.OriginalImagePath: Meme.saveImageWithName("sheldon") ?? "",
+                Keys.MemedImagePath: Meme.saveImageWithName("sheldon_memed") ?? ""],
+            [Keys.SentDate: Meme.dateByAddingDays(-2),
+                Keys.TopText: "Day 37:",
+                Keys.BottomText: "They still do not suspect I am a mere cat.",
+                Keys.TextAttributesDictionary: [
+                    Keys.FontName : "IMPACTED",
+                    Keys.TextColorString : "black",
+                    Keys.StrokeColorString : "white",
+                ],
+                Keys.OriginalImagePath: Meme.saveImageWithName("cat") ?? "",
+                Keys.MemedImagePath: Meme.saveImageWithName("cat_memed") ?? ""],
+            [Keys.SentDate: Meme.dateByAddingDays(-1),
+                Keys.TopText: "Homework due at midnight...",
+                Keys.BottomText: "Got everything turned in at 11:59 pm",
+                Keys.TextAttributesDictionary: [
+                    Keys.FontName : "Impact",
+                    Keys.TextColorString : "blue",
+                    Keys.StrokeColorString : "white",
+                ],
+                Keys.OriginalImagePath: Meme.saveImageWithName("successKid") ?? "",
+                Keys.MemedImagePath: Meme.saveImageWithName("successKid_memed") ?? ""]
         ]
         var memes = [Meme]()
         
         var i: Int = 0
         for memeDic: [String: AnyObject] in memeDictionaries {
-            let meme = Meme(sentDate: NSDate(timeInterval: Double(-1 * (memeDic[SentDateKey] as! Int) * 24 * 60 * 60), sinceDate: NSDate()), topText: memeDic[TopTextKey] as! String, bottomText: memeDic[BottomTextKey] as! String, textAttributes: memeDic[TextAttributesKey] as! [String: AnyObject], originalImage: UIImage(named: memeDic[OriginalImageKey] as! String)!, memedImage: UIImage(named: memeDic[MemedImageKey] as! String)!)
+            let meme = Meme(dictionary: memeDic)
             memes.append(meme)
             
             i++
         }
         
         return memes
+    }
+    
+    // MARK: Helpers
+    
+    // Save image to Document Directory, and return the file path
+    class func saveImageWithName(name: String) -> String? {
+        let dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
+        let imagePath = NSURL.fileURLWithPathComponents([dirPath, name + ".jpg"])!.path!
+
+        if !NSFileManager.defaultManager().fileExistsAtPath(imagePath) {
+            if UIImageJPEGRepresentation(UIImage(named: name)!, 1.0)!.writeToFile(imagePath, atomically: false) {
+                print("Original image saved")
+                return imagePath
+            } else {
+                print("Unable to save original image")
+                return nil
+            }
+        } else {
+            return imagePath
+        }
+    }
+    
+    // Return the date of n days later
+    class func dateByAddingDays(nDays: Double) -> NSDate {
+        return NSDate().dateByAddingTimeInterval(nDays*24*60*60)
     }
     
 }

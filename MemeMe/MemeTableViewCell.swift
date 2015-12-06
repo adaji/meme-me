@@ -16,18 +16,4 @@ class MemeTableViewCell: UITableViewCell {
     @IBOutlet weak var memeTextLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     
-    func setMeme(image: UIImage, topText: String, bottomText: String, textAttributes: [String: AnyObject], sentDate: String) {
-        memeImageView.image = image
-
-        let attributes = textAttributesWithFontSize(textAttributes, size: 14)
-        topLabel.attributedText = NSAttributedString(string: topText, attributes: attributes)
-        topLabel.lineBreakMode = .ByTruncatingMiddle
-        bottomLabel.attributedText = NSAttributedString(string: bottomText, attributes: attributes)
-        bottomLabel.lineBreakMode = .ByTruncatingMiddle
-        memeTextLabel.text = topText + "..." + bottomText
-        memeTextLabel.lineBreakMode = .ByTruncatingMiddle
-
-        dateLabel.text = sentDate
-    }
-    
 }

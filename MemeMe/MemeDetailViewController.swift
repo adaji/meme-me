@@ -20,7 +20,7 @@ class MemeDetailViewController: UIViewController, MemeEditorViewControllerDelega
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .Plain, target: self, action: "editMeme")
         tabBarController?.tabBar.hidden = true
         
-        imageView.image = meme.memedImage
+        imageView.image = UIImage(contentsOfFile: meme.memedImagePath)
     }
     
     override func viewWillDisappear(animated: Bool) {

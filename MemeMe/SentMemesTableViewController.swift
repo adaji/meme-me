@@ -8,11 +8,17 @@
 
 import UIKit
 
+// MARK: - SentMemesTableViewController: UITableViewController
+
 class SentMemesTableViewController: UITableViewController {
+    
+    // MARK: Properties
     
     // Display latest items at the top
     private var memes: [Meme]!
     private let localMemes: [Meme] = Meme.localMemes
+    
+    // MARK: Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,8 +65,7 @@ class SentMemesTableViewController: UITableViewController {
         let memes = memesForGroup(indexPath.section)
         let meme = memes[memes.count - 1 - indexPath.row]
         
-        
-        cell.setMeme(meme.originalImage, topText: meme.topText, bottomText: meme.bottomText, textAttributes: meme.textAttributes, sentDate: stringFromDate(meme.sentDate))
+        configureCell(cell, withMeme: meme)
         
         return cell
     }
@@ -107,6 +112,27 @@ class SentMemesTableViewController: UITableViewController {
         default:
             assert(false, "Unexpected section")
         }
+    }
+    
+    // MARK: Configure UI
+    
+    func configureCell(cell: MemeTableViewCell, withMeme meme: Meme) {
+        print(meme.originalImagePath)
+        let fileManager = NSFileManager.defaultManager()
+        if fileManager.fileExistsAtPath(meme.originalImagePath) {
+            let originalImage = UIImage(contentsOfFile: meme.originalImagePath)
+            cell.memeImageView.image = originalImage
+        }
+        
+        let attributes = Meme.previewTextAttributesForMeme(meme)
+        cell.topLabel.attributedText = NSAttributedString(string: meme.topText, attributes: attributes)
+        cell.topLabel.lineBreakMode = .ByTruncatingMiddle
+        cell.bottomLabel.attributedText = NSAttributedString(string: meme.bottomText, attributes: attributes)
+        cell.bottomLabel.lineBreakMode = .ByTruncatingMiddle
+        cell.memeTextLabel.text = meme.topText + "..." + meme.bottomText
+        cell.memeTextLabel.lineBreakMode = .ByTruncatingMiddle
+        
+        cell.dateLabel.text = Meme.stringFromDate(meme.sentDate)
     }
     
     // MARK: Navigation

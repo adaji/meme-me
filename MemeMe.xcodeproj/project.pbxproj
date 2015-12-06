@@ -135,10 +135,9 @@
 		604293171BD4BA4C0023E3D3 /* MemeMe */ = {
 			isa = PBXGroup;
 			children = (
-				60A66F4E1BD4F9B0009EB55D /* Meme.swift */,
-				60B17FC61BDF57FC00A14F59 /* View Controllers */,
+				6081D3071C12F6790079FDF7 /* Models */,
 				60C5CFA51BDF7C9200C79CC8 /* Views */,
-				60C5CFA11BDF78A600C79CC8 /* MemeStyleGuide.swift */,
+				60B17FC61BDF57FC00A14F59 /* Controllers */,
 				604293181BD4BA4C0023E3D3 /* AppDelegate.swift */,
 				6042931C1BD4BA4C0023E3D3 /* Main.storyboard */,
 				6042931F1BD4BA4C0023E3D3 /* Assets.xcassets */,
@@ -167,6 +166,15 @@
 			path = MemeMeUITests;
 			sourceTree = "<group>";
 		};
+		6081D3071C12F6790079FDF7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				60A66F4E1BD4F9B0009EB55D /* Meme.swift */,
+				60C5CFA11BDF78A600C79CC8 /* MemeStyleGuide.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
 		60B17FBB1BDF428200A14F59 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
@@ -180,7 +188,7 @@
 			name = Fonts;
 			sourceTree = "<group>";
 		};
-		60B17FC61BDF57FC00A14F59 /* View Controllers */ = {
+		60B17FC61BDF57FC00A14F59 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				60B17FB91BDF31A600A14F59 /* SentMemesTableViewController.swift */,
@@ -189,7 +197,7 @@
 				6042931A1BD4BA4C0023E3D3 /* MemeEditorViewController.swift */,
 				60ECE9001BFC82D100D5B165 /* KeyboardHandlingViewController.swift */,
 			);
-			name = "View Controllers";
+			name = Controllers;
 			sourceTree = "<group>";
 		};
 		60C5CFA51BDF7C9200C79CC8 /* Views */ = {
@@ -265,7 +273,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0700;
-				ORGANIZATIONNAME = "Ada Ji";
+				ORGANIZATIONNAME = Superada;
 				TargetAttributes = {
 					604293141BD4BA4C0023E3D3 = {
 						CreatedOnToolsVersion = 7.0.1;
@@ -494,7 +502,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = MemeMe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.adaji.MemeMe;
+				PRODUCT_BUNDLE_IDENTIFIER = com.superada.MemeMe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -506,7 +514,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = MemeMe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.adaji.MemeMe;
+				PRODUCT_BUNDLE_IDENTIFIER = com.superada.MemeMe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

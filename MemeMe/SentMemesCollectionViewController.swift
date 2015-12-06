@@ -89,9 +89,19 @@ class SentMemesCollectionViewController: UICollectionViewController {
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionViewCell", forIndexPath: indexPath) as! MemeCollectionViewCell
         let meme = memesForGroup(indexPath.section)[indexPath.row]
-        cell.setMeme(meme.originalImage, topText: meme.topText, bottomText: meme.bottomText, textAttributes: meme.textAttributes)
+        configureCell(cell, withMeme: meme)
         
         return cell
+    }
+    
+    func configureCell(cell: MemeCollectionViewCell, withMeme meme: Meme) {
+        cell.memeImageView.image = UIImage(contentsOfFile: meme.originalImagePath)
+        
+        let attributes = Meme.previewTextAttributesForMeme(meme)
+        cell.topLabel.attributedText = NSAttributedString(string: meme.topText, attributes: attributes)
+        cell.topLabel.lineBreakMode = .ByTruncatingMiddle
+        cell.bottomLabel.attributedText = NSAttributedString(string: meme.bottomText, attributes: attributes)
+        cell.bottomLabel.lineBreakMode = .ByTruncatingMiddle
     }
     
     // MARK: Collection View Delegate
