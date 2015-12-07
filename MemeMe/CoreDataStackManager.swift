@@ -1,28 +1,19 @@
 //
 //  CoreDataStackManager.swift
-//  FavoriteActors
+//  MemeMe
 //
-//  Created by Jason on 3/10/15.
-//  Copyright (c) 2015 Udacity. All rights reserved.
+//  Created by Ada Ji on 10/19/15.
+//  Copyright © 2015 Ada Ji. All rights reserved.
 //
 
 import Foundation
 import CoreData
 
-/**
- * The CoreDataStackManager contains the code that was previously living in the 
- * AppDelegate in Lesson 3. Apple puts the code in the AppDelegate in many of their
- * Xcode templates. But they put it in a convenience class like this in sample code
- * like the "Earthquakes" project.
- *
- */
-
-private let SQLITE_FILE_NAME = "FavoriteActors.sqlite"
+private let SQLITE_FILE_NAME = "SentMemes.sqlite"
 
 class CoreDataStackManager {
     
-    
-    // MARK: - Shared Instance
+    // MARK: Shared Instance
     
     /**
      *  This class variable provides an easy way to get access
@@ -36,7 +27,7 @@ class CoreDataStackManager {
         return Static.instance
     }
     
-    // MARK: - The Core Data stack. The code has been moved, unaltered, from the AppDelegate.
+    // MARK: Core Data Stack
     
     lazy var applicationDocumentsDirectory: NSURL = {
         
@@ -107,7 +98,7 @@ class CoreDataStackManager {
         return managedObjectContext
         }()
     
-    // MARK: - Core Data Saving support
+    // MARK: Core Data Saving Support
     
     func saveContext () {
         if managedObjectContext.hasChanges {

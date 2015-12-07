@@ -7,18 +7,19 @@
 //
 
 import UIKit
+import CoreData
 
-class SentMemesCollectionViewController: UICollectionViewController {
+class SentMemesCollectionViewController: UICollectionViewController, NSFetchedResultsControllerDelegate {
+    
+    // MARK: Properties
     
     @IBOutlet weak var flowLayout: UICollectionViewFlowLayout!
-    
-    // Display oldest items at the top
-    private let localMemes: [Meme] = Meme.localMemes
-    private var memes: [Meme]!
     
     private let MINIMUM_SPACING: CGFloat = 3.0
     private let NUMBER_OF_ITEMS_PER_LINE_PORTRAIT: Int = 3
     private let NUMBER_OF_ITEMS_PER_LINE_LANDSCAPE: Int = 5
+    
+    // MARK: Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,33 +27,19 @@ class SentMemesCollectionViewController: UICollectionViewController {
         flowLayout.minimumInteritemSpacing = MINIMUM_SPACING
         flowLayout.minimumLineSpacing = MINIMUM_SPACING
         flowLayout.itemSize = itemSize()
+        
+        do {
+            try fetchedResultController.performFetch()
+        } catch {
+            print("Unresolved error: \(error)")
+            abort()
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        memes = appDelegate.memes
-        
-        let section = MemeGroup.Mine.rawValue
-        // Reload user created meme section if user deletes item(s) from table view
-        if appDelegate.shouldReloadCollectionView! {
-            collectionView!.reloadSections(NSIndexSet(index: section))
-            appDelegate.shouldReloadCollectionView = false
-        }
-            // Otherwise, only update view(s) for newly created meme(s)
-        else {
-            let itemsCount = collectionView!.numberOfItemsInSection(section)
-            if itemsCount < memes.count {
-                var indexPaths = [NSIndexPath]()
-                for item in itemsCount...(memes.count - 1) {
-                    indexPaths.append(NSIndexPath(forItem: item, inSection: section))
-                }
-                collectionView!.insertItemsAtIndexPaths(indexPaths)
-                let headerView = collectionView?.supplementaryViewForElementKind(UICollectionElementKindSectionHeader, atIndexPath: NSIndexPath(forItem: 0, inSection: section)) as! MemeCollectionHeaderView
-                headerView.titleLabel.text = MemeGroups[section] + " (" + String(memesForGroup(section).count) + ")"
-            }
-        }
+        collectionView!.reloadData()
     }
     
     override func viewWillLayoutSubviews() {
@@ -62,10 +49,26 @@ class SentMemesCollectionViewController: UICollectionViewController {
         flowLayout.itemSize = itemSize()
     }
     
-    // MARK: Collection View Data Source
+    // MARK: Core Data Convenience
+    
+    lazy var sharedContext: NSManagedObjectContext = {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }()
+    
+    func saveContext() {
+        CoreDataStackManager.sharedInstance().saveContext()
+    }
+    
+    lazy var fetchedResultController: NSFetchedResultsController = {
+        let fetchRequest = NSFetchRequest(entityName: "Meme")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Meme.Keys.SentDate, ascending: true)]
+        return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
+    }()
+    
+    // MARK: UICollectionViewDataSource
     
     override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
-        return MemeGroups.count
+        return 1
     }
     
     // Section header view
@@ -73,7 +76,7 @@ class SentMemesCollectionViewController: UICollectionViewController {
         switch kind {
         case UICollectionElementKindSectionHeader:
             let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MemeCollectionHeaderView", forIndexPath: indexPath) as! MemeCollectionHeaderView
-            headerView.titleLabel.text = MemeGroups[indexPath.section] + " (" + String(memesForGroup(indexPath.section).count) + ")"
+            headerView.titleLabel.text = "Sent Memes" + " (" + String(fetchedResultController.sections![indexPath.section].numberOfObjects) + ")"
             
             return headerView
             
@@ -83,19 +86,19 @@ class SentMemesCollectionViewController: UICollectionViewController {
     }
     
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return memesForGroup(section).count
+        return fetchedResultController.sections![section].numberOfObjects
     }
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionViewCell", forIndexPath: indexPath) as! MemeCollectionViewCell
-        let meme = memesForGroup(indexPath.section)[indexPath.row]
+        let meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
         configureCell(cell, withMeme: meme)
         
         return cell
     }
     
     func configureCell(cell: MemeCollectionViewCell, withMeme meme: Meme) {
-        cell.memeImageView.image = UIImage(contentsOfFile: meme.originalImagePath)
+        cell.memeImageView.image = Meme.imageWithName(meme.originalImageName)
         
         let attributes = Meme.previewTextAttributesForMeme(meme)
         cell.topLabel.attributedText = NSAttributedString(string: meme.topText, attributes: attributes)
@@ -109,26 +112,9 @@ class SentMemesCollectionViewController: UICollectionViewController {
     override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         collectionView.deselectItemAtIndexPath(indexPath, animated: true)
         
-//        let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-//        detailVC.meme = memesForGroup(indexPath.section)[indexPath.row]
-//        navigationController!.pushViewController(detailVC, animated: true)
-    }
-    
-    // MARK: Navigation
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let identifier = segue.identifier {
-            switch identifier {
-            case "ShowMemeDetail":
-                if let detailVC = segue.destinationViewController as? MemeDetailViewController {
-                    let memes = memesForGroup((collectionView?.indexPathsForSelectedItems()![0].section)!)
-                    detailVC.meme = memes[(collectionView?.indexPathsForSelectedItems()![0].row)!]
-                }
-                return
-            default:
-                return
-            }
-        }
+        let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
+        detailVC.meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
+        navigationController!.pushViewController(detailVC, animated: true)
     }
     
     // MARK: Helper Methods
@@ -144,17 +130,6 @@ class SentMemesCollectionViewController: UICollectionViewController {
         }
         
         return CGSizeMake(dimension, dimension)
-    }
-    
-    func memesForGroup(group: Int) -> [Meme] {
-        switch group {
-        case MemeGroup.Mine.rawValue:
-            return memes
-        case MemeGroup.Web.rawValue:
-            return localMemes
-        default:
-            assert(false, "Unknown date group type")
-        }
     }
     
 }

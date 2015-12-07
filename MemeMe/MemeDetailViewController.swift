@@ -14,13 +14,18 @@ class MemeDetailViewController: UIViewController, MemeEditorViewControllerDelega
     
     var meme: Meme!
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .Plain, target: self, action: "editMeme")
+        
+        imageView.image = Meme.imageWithName(meme.memedImageName)
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .Plain, target: self, action: "editMeme")
         tabBarController?.tabBar.hidden = true
-        
-        imageView.image = UIImage(contentsOfFile: meme.memedImagePath)
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -38,10 +43,12 @@ class MemeDetailViewController: UIViewController, MemeEditorViewControllerDelega
     
     // MARK: Meme Editor View Delegate
     
-    func didSendMeme(meme: Meme) {
-        self.meme = meme
+    func memeEditor(memeEditor: MemeEditorViewController, didSentMeme meme: Meme?) {
+        if let meme = meme {
+            self.meme = meme
+        }
     }
-    
+
 }
 
 

@@ -8,48 +8,56 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 // MARK: - Meme: NSObject
 
-class Meme: NSObject {
+class Meme: NSManagedObject {
     
     // MARK: Keys
     
     struct Keys {
         static let SentDate = "sentDate"
         static let TextAttributesDictionary = "textAttributesDictionary"
-        static let FontName = "fontName"
-        static let TextColorString = "textColorString"
-        static let StrokeColorString = "strokeColorString"
+        static let FontNameIndex = "fontNameIndex"
+        static let TextColorIndex = "textColorIndex"
+        static let StrokeColorIndex = "strokeColorIndex"
         static let TopText = "topText"
         static let BottomText = "bottomText"
-        static let OriginalImagePath = "originalImagePath"
-        static let MemedImagePath = "memedImagePath"
+        static let OriginalImageName = "originalImageName"
+        static let MemedImageName = "memedImageName"
     }
     
     // MARK: Properties
     
-    var sentDate = NSDate()
-    var fontName = ""
-    var textColorString = ""
-    var strokeColorString = ""
-    var topText = ""
-    var bottomText = ""
-    var originalImagePath = ""
-    var memedImagePath = ""
+    @NSManaged var sentDate: NSDate
+    @NSManaged var fontNameIndex: NSNumber
+    @NSManaged var textColorIndex: NSNumber
+    @NSManaged var strokeColorIndex: NSNumber
+    @NSManaged var topText: String
+    @NSManaged var bottomText: String
+    @NSManaged var originalImageName: String
+    @NSManaged var memedImageName: String
     
     // MARK: Initializers
     
-    init(dictionary: [String: AnyObject]) {
+    override init(entity: NSEntityDescription, insertIntoManagedObjectContext context: NSManagedObjectContext?) {
+        super.init(entity: entity, insertIntoManagedObjectContext: context)
+    }
+    
+    init(dictionary: [String: AnyObject], context: NSManagedObjectContext) {
+        let entity = NSEntityDescription.entityForName("Meme", inManagedObjectContext: context)!
+        super.init(entity: entity, insertIntoManagedObjectContext: context)
+        
         sentDate = dictionary[Keys.SentDate] as! NSDate
         let textAttributesDictionary = dictionary[Keys.TextAttributesDictionary] as! [String: AnyObject]
-        fontName = textAttributesDictionary[Keys.FontName] as! String
-        textColorString = textAttributesDictionary[Keys.TextColorString] as! String
-        strokeColorString = textAttributesDictionary[Keys.StrokeColorString] as! String
+        fontNameIndex = textAttributesDictionary[Keys.FontNameIndex] as! NSNumber
+        textColorIndex = textAttributesDictionary[Keys.TextColorIndex] as! NSNumber
+        strokeColorIndex = textAttributesDictionary[Keys.StrokeColorIndex] as! NSNumber
         topText = dictionary[Keys.TopText] as! String
         bottomText = dictionary[Keys.BottomText] as! String
-        originalImagePath = dictionary[Keys.OriginalImagePath] as! String
-        memedImagePath = dictionary[Keys.MemedImagePath] as! String
+        originalImageName = dictionary[Keys.OriginalImageName] as! String
+        memedImageName = dictionary[Keys.MemedImageName] as! String
     }
     
 }
@@ -60,54 +68,53 @@ extension Meme {
     
     // Generate an array of local memes
     static var localMemes: [Meme] {
-
         let memeDictionaries: [[String: AnyObject]] = [
             [Keys.SentDate: Meme.dateByAddingDays(-10),
                 Keys.TopText: "I changed all my passwords to \"incorrect\"",
                 Keys.BottomText: "So whenever I forget, it will tell me \"Your password is incorrect\"",
                 Keys.TextAttributesDictionary: [
-                    Keys.FontName : "IMPACTED",
-                    Keys.TextColorString : "red",
-                    Keys.StrokeColorString : "black",
+                    Keys.FontNameIndex : 1,
+                    Keys.TextColorIndex : 1,
+                    Keys.StrokeColorIndex : 0,
                 ],
-                Keys.OriginalImagePath: Meme.saveImageWithName("funnyGuy") ?? "",
-                Keys.MemedImagePath: Meme.saveImageWithName("funnyGuy_memed") ?? ""],
+                Keys.OriginalImageName: Meme.saveImageWithName("funnyGuy") ?? "",
+                Keys.MemedImageName: Meme.saveImageWithName("funnyGuy_memed") ?? ""],
             [Keys.SentDate: Meme.dateByAddingDays(-5),
                 Keys.TopText: "Don't you think that if I were wrong,",
                 Keys.BottomText: "I'd know it?",
                 Keys.TextAttributesDictionary: [
-                    Keys.FontName : "Impact",
-                    Keys.TextColorString : "white",
-                    Keys.StrokeColorString : "black",
+                    Keys.FontNameIndex : 0,
+                    Keys.TextColorIndex : 0,
+                    Keys.StrokeColorIndex : 0,
                 ],
-                Keys.OriginalImagePath: Meme.saveImageWithName("sheldon") ?? "",
-                Keys.MemedImagePath: Meme.saveImageWithName("sheldon_memed") ?? ""],
+                Keys.OriginalImageName: Meme.saveImageWithName("sheldon") ?? "",
+                Keys.MemedImageName: Meme.saveImageWithName("sheldon_memed") ?? ""],
             [Keys.SentDate: Meme.dateByAddingDays(-2),
                 Keys.TopText: "Day 37:",
                 Keys.BottomText: "They still do not suspect I am a mere cat.",
                 Keys.TextAttributesDictionary: [
-                    Keys.FontName : "IMPACTED",
-                    Keys.TextColorString : "black",
-                    Keys.StrokeColorString : "white",
+                    Keys.FontNameIndex : 1,
+                    Keys.TextColorIndex : 3,
+                    Keys.StrokeColorIndex : 1,
                 ],
-                Keys.OriginalImagePath: Meme.saveImageWithName("cat") ?? "",
-                Keys.MemedImagePath: Meme.saveImageWithName("cat_memed") ?? ""],
+                Keys.OriginalImageName: Meme.saveImageWithName("cat") ?? "",
+                Keys.MemedImageName: Meme.saveImageWithName("cat_memed") ?? ""],
             [Keys.SentDate: Meme.dateByAddingDays(-1),
                 Keys.TopText: "Homework due at midnight...",
                 Keys.BottomText: "Got everything turned in at 11:59 pm",
                 Keys.TextAttributesDictionary: [
-                    Keys.FontName : "Impact",
-                    Keys.TextColorString : "blue",
-                    Keys.StrokeColorString : "white",
+                    Keys.FontNameIndex : 0,
+                    Keys.TextColorIndex : 2,
+                    Keys.StrokeColorIndex : 1,
                 ],
-                Keys.OriginalImagePath: Meme.saveImageWithName("successKid") ?? "",
-                Keys.MemedImagePath: Meme.saveImageWithName("successKid_memed") ?? ""]
+                Keys.OriginalImageName: Meme.saveImageWithName("successKid") ?? "",
+                Keys.MemedImageName: Meme.saveImageWithName("successKid_memed") ?? ""]
         ]
         var memes = [Meme]()
         
         var i: Int = 0
         for memeDic: [String: AnyObject] in memeDictionaries {
-            let meme = Meme(dictionary: memeDic)
+            let meme = Meme(dictionary: memeDic, context: CoreDataStackManager.sharedInstance().managedObjectContext)
             memes.append(meme)
             
             i++

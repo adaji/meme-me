@@ -11,7 +11,7 @@ import UIKit
 // MARK: - Protocols
 
 protocol MemeEditorViewControllerDelegate {
-    func didSendMeme(meme: Meme)
+    func memeEditor(memeEditor: MemeEditorViewController, didSentMeme meme: Meme?)
 }
 
 // MARK: - Meme Editor View Controller
@@ -169,35 +169,28 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
             (activity, success, items, error) in
             if success {
                 let sentDate = NSDate()
+                let originalImageName = sentDate.description + ".jpg"
+                let memedImageName = sentDate.description + "_memed.jpg"
                 
-                let dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
-                let originalImagePath = NSURL.fileURLWithPathComponents([dirPath, sentDate.description + ".jpg"])!.path!
-                let memedImagePath = NSURL.fileURLWithPathComponents([dirPath, sentDate.description + "-memed.jpg"])!.path!
-                
-                let dictionary: [String: AnyObject] = [
-                    Meme.Keys.SentDate: sentDate,
-                    Meme.Keys.TextAttributesDictionary: Meme.textAttributesDictionary(self.topTextField.defaultTextAttributes),
-                    Meme.Keys.TopText: self.topTextField.text!,
-                    Meme.Keys.BottomText: self.bottomTextField.text!,
-                    Meme.Keys.OriginalImagePath: originalImagePath,
-                    Meme.Keys.MemedImagePath: memedImagePath
-                ]
+                if UIImageJPEGRepresentation(self.imageView.image!, 1.0)!.writeToFile(Meme.imagePathWithName(originalImageName), atomically: false) && UIImageJPEGRepresentation(memedImage, 1.0)!.writeToFile(Meme.imagePathWithName(memedImageName), atomically: false) {
+                    print("Images saved")
 
-                let meme = Meme(dictionary: dictionary)
-                (UIApplication.sharedApplication().delegate as! AppDelegate).memes.append(meme)
-                self.delegate?.didSendMeme(meme)
-                
-                self.dismissViewControllerAnimated(true, completion: nil)
-
-                if UIImageJPEGRepresentation(self.imageView.image!, 1.0)!.writeToFile(originalImagePath, atomically: false) {
-                    print("Original image saved")
+                    let dictionary: [String: AnyObject] = [
+                        Meme.Keys.SentDate: sentDate,
+                        Meme.Keys.TextAttributesDictionary: Meme.textAttributesDictionary(self.topTextField.defaultTextAttributes),
+                        Meme.Keys.TopText: self.topTextField.text!,
+                        Meme.Keys.BottomText: self.bottomTextField.text!,
+                        Meme.Keys.OriginalImageName: originalImageName,
+                        Meme.Keys.MemedImageName: memedImageName
+                    ]
+                    
+                    let meme = Meme(dictionary: dictionary, context: CoreDataStackManager.sharedInstance().managedObjectContext)
+                    CoreDataStackManager.sharedInstance().saveContext()
+                    self.delegate?.memeEditor(self, didSentMeme: meme)
+                    
+                    self.dismissViewControllerAnimated(true, completion: nil)
                 } else {
-                    print("Unable to save original image")
-                }
-                if UIImageJPEGRepresentation(memedImage, 1.0)!.writeToFile(memedImagePath, atomically: false) {
-                    print("Memed image saved")
-                } else {
-                    print("Unable to save memed image")
+                    print("Unable to save images")
                 }
             }
         }
@@ -284,6 +277,8 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
     }
     
     @IBAction func cancelEditing(sender: UIBarButtonItem) {
+        delegate?.memeEditor(self, didSentMeme: nil)
+        
         dismissViewControllerAnimated(true, completion: nil)
     }
     
@@ -355,14 +350,14 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
         else {
             shareButton.enabled = true
             
-            imageView.image = UIImage(contentsOfFile: meme!.originalImagePath)
+            imageView.image = Meme.imageWithName(meme!.originalImageName)
             
             topTextField.text = meme!.topText
             bottomTextField.text = meme!.bottomText
             
-            currentFontNameIndex = Meme.TextAttributes.FontNames.indexOf(meme!.fontName)
-            currentTextColorIndex = Meme.TextAttributes.TextColorStrings.indexOf(meme!.textColorString)
-            currentStrokeColorIndex = Meme.TextAttributes.StrokeColorStrings.indexOf(meme!.strokeColorString)
+            currentFontNameIndex = meme!.fontNameIndex.integerValue
+            currentTextColorIndex = meme!.textColorIndex.integerValue
+            currentStrokeColorIndex = meme!.strokeColorIndex.integerValue
             
             configureTextFields(Meme.textAttributesForMeme(meme!))
         }
@@ -507,7 +502,7 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
     // MARK: Helper Functions
     
     func configureTextFields() {
-        let textAttributes: [String: AnyObject] = Meme.textAttributes(Meme.TextAttributes.FontNames[currentFontNameIndex], textColorString: Meme.TextAttributes.TextColorStrings[currentTextColorIndex], strokeColorString: Meme.TextAttributes.StrokeColorStrings[currentStrokeColorIndex])
+        let textAttributes: [String: AnyObject] = Meme.textAttributes(currentFontNameIndex, textColorIndex: currentTextColorIndex, strokeColorIndex: currentStrokeColorIndex)
         
         configureTextFields(textAttributes)
     }

@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="14F27" minimumToolsVersion="Xcode 7.0">
-    <elements/>
+    <entity name="Meme" representedClassName=".Meme" syncable="YES">
+        <attribute name="bottomText" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fontNameIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="memedImageName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="originalImageName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sentDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="strokeColorIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="textColorIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="topText" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Meme" positionX="-63" positionY="-18" width="128" height="165"/>
+    </elements>
 </model>

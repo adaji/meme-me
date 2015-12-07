@@ -15,6 +15,29 @@ extension Meme {
     
     // MARK: Text Attributes
     
+    enum FontName: Int {
+        case FontName0
+        case FontName1
+        case FontName2
+        case FontName3
+        case FontName4
+        case FontName5
+    }
+    
+    enum TextColor: Int {
+        case White
+        case Red
+        case Blue
+        case Black
+    }
+    
+    enum StrokeColor: Int {
+        case Black
+        case White
+        case Red
+        case Blue
+    }
+    
     struct TextAttributes {
         static let FontNames = ["Impact", "IMPACTED", "Impacted 2.0", "New", "Thanatos", "Danger Diabolik"]
         static let TextColorStrings = ["white", "red", "blue", "black"]
@@ -26,69 +49,137 @@ extension Meme {
         static let Preview: CGFloat = 14.0
     }
     
-    class func colorFromString(colorString: String) -> UIColor {
-        switch colorString {
-        case "white":
-            return UIColor.whiteColor()
-        case "black":
-            return UIColor.blackColor()
-        case "red":
-            return UIColor.redColor()
-        case "blue":
-            return UIColor.blueColor()
+    class func fontNameWithIndex(index: Int) -> String {
+        switch index {
+        case FontName.FontName0.rawValue:
+            return "Impact"
+        case FontName.FontName1.rawValue:
+            return "IMPACTED"
+        case FontName.FontName2.rawValue:
+            return "Impacted 2.0"
+        case FontName.FontName3.rawValue:
+            return "New"
+        case FontName.FontName4.rawValue:
+            return "Thanatos"
+        case FontName.FontName5.rawValue:
+            return "Danger Diabolik"
         default:
-            assert(false, "Unexpected color")
+            assert(false, "Unexpected font name")
         }
     }
     
-    class func stringFromColor(color: UIColor) -> String {
-        switch color {
-        case UIColor.whiteColor():
-            return "white"
-        case UIColor.blackColor():
-            return "black"
-        case UIColor.redColor():
-            return "red"
-        case UIColor.blueColor():
-            return "blue"
+    class func indexForFontName(fontName: String) -> Int {
+        switch fontName {
+            case "Impact":
+            return FontName.FontName0.rawValue
+            case "IMPACTED":
+            return FontName.FontName1.rawValue
+            case "Impacted 2.0":
+            return FontName.FontName2.rawValue
+            case "New":
+            return FontName.FontName3.rawValue
+            case "Thanatos":
+            return FontName.FontName4.rawValue
+            case "Danger Diabolik":
+            return FontName.FontName5.rawValue
         default:
-            assert(false, "Unexpected color")
+            assert(false, "Unexpected font name")
+        }
+    }
+    
+    class func textColorWithIndex(index: Int) -> UIColor {
+        switch index {
+        case TextColor.White.rawValue:
+            return UIColor.whiteColor()
+        case TextColor.Black.rawValue:
+            return UIColor.blackColor()
+        case TextColor.Red.rawValue:
+            return UIColor.redColor()
+        case TextColor.Blue.rawValue:
+            return UIColor.blueColor()
+        default:
+            assert(false, "Unexpected text color")
+        }
+    }
+    
+    class func indexForTextColor(textColor: UIColor) -> Int {
+        switch textColor {
+        case UIColor.whiteColor():
+            return TextColor.White.rawValue
+        case UIColor.blackColor():
+            return TextColor.Black.rawValue
+        case UIColor.redColor():
+            return TextColor.Red.rawValue
+        case UIColor.blueColor():
+            return TextColor.Blue.rawValue
+        default:
+            assert(false, "Unexpected text color")
+        }
+    }
+    
+    class func strokeColorWithIndex(index: Int) -> UIColor {
+        switch index {
+        case StrokeColor.White.rawValue:
+            return UIColor.whiteColor()
+        case StrokeColor.Black.rawValue:
+            return UIColor.blackColor()
+        case StrokeColor.Red.rawValue:
+            return UIColor.redColor()
+        case StrokeColor.Blue.rawValue:
+            return UIColor.blueColor()
+        default:
+            assert(false, "Unexpected stroke color")
+        }
+    }
+    
+    class func indexForStrokeColor(strokeColor: UIColor) -> Int {
+        switch strokeColor {
+        case UIColor.whiteColor():
+            return StrokeColor.White.rawValue
+        case UIColor.blackColor():
+            return StrokeColor.Black.rawValue
+        case UIColor.redColor():
+            return StrokeColor.Red.rawValue
+        case UIColor.blueColor():
+            return StrokeColor.Blue.rawValue
+        default:
+            assert(false, "Unexpected stroke color")
         }
     }
     
     // Convert UITextField's textAttributes to Meme's textAttributes dictionary
     class func textAttributesDictionary(textAttributes: [String: AnyObject]) -> [String: AnyObject] {
         return [
-            Keys.FontName: textAttributes[NSFontAttributeName]!.fontName,
-            Keys.TextColorString: Meme.stringFromColor(textAttributes[NSForegroundColorAttributeName] as! UIColor),
-            Keys.StrokeColorString: Meme.stringFromColor(textAttributes[NSStrokeColorAttributeName] as! UIColor)
+            Keys.FontNameIndex: Meme.indexForFontName(textAttributes[NSFontAttributeName]!.fontName),
+            Keys.TextColorIndex: Meme.indexForTextColor(textAttributes[NSForegroundColorAttributeName] as! UIColor),
+            Keys.StrokeColorIndex: Meme.indexForStrokeColor(textAttributes[NSStrokeColorAttributeName] as! UIColor)
         ]
     }
     
     // Convert Meme's textAttributes dictionary to UITextField's textAttributes
     class func textAttributesForMeme(meme: Meme) -> [String: AnyObject] {
         return [
-            NSFontAttributeName : UIFont(name: meme.fontName, size: FontSizes.Full)!,
-            NSForegroundColorAttributeName : Meme.colorFromString(meme.textColorString),
-            NSStrokeColorAttributeName : Meme.colorFromString(meme.strokeColorString),
-            NSStrokeWidthAttributeName : -4
-        ]
-    }
-    
-    class func textAttributes(fontName: String, textColorString: String, strokeColorString: String) -> [String: AnyObject] {
-        return [
-            NSFontAttributeName : UIFont(name: fontName, size: FontSizes.Full)!,
-            NSForegroundColorAttributeName : Meme.colorFromString(textColorString),
-            NSStrokeColorAttributeName : Meme.colorFromString(strokeColorString),
+            NSFontAttributeName : UIFont(name: Meme.fontNameWithIndex(meme.fontNameIndex.integerValue), size: FontSizes.Full)!,
+            NSForegroundColorAttributeName : Meme.textColorWithIndex(meme.textColorIndex.integerValue),
+            NSStrokeColorAttributeName : Meme.strokeColorWithIndex(meme.strokeColorIndex.integerValue),
             NSStrokeWidthAttributeName : -4
         ]
     }
     
     class func previewTextAttributesForMeme(meme: Meme) -> [String: AnyObject] {
         return [
-            NSFontAttributeName : UIFont(name: meme.fontName, size: FontSizes.Preview)!,
-            NSForegroundColorAttributeName : Meme.colorFromString(meme.textColorString),
-            NSStrokeColorAttributeName : Meme.colorFromString(meme.strokeColorString),
+            NSFontAttributeName : UIFont(name: Meme.fontNameWithIndex(meme.fontNameIndex.integerValue), size: FontSizes.Preview)!,
+            NSForegroundColorAttributeName : Meme.textColorWithIndex(meme.textColorIndex.integerValue),
+            NSStrokeColorAttributeName : Meme.strokeColorWithIndex(meme.strokeColorIndex.integerValue),
+            NSStrokeWidthAttributeName : -4
+        ]
+    }
+    
+    class func textAttributes(fontNameIndex: Int, textColorIndex: Int, strokeColorIndex: Int) -> [String: AnyObject] {
+        return [
+            NSFontAttributeName : UIFont(name: Meme.fontNameWithIndex(fontNameIndex), size: FontSizes.Full)!,
+            NSForegroundColorAttributeName : Meme.textColorWithIndex(textColorIndex),
+            NSStrokeColorAttributeName : Meme.strokeColorWithIndex(strokeColorIndex),
             NSStrokeWidthAttributeName : -4
         ]
     }
@@ -124,7 +215,7 @@ extension Meme {
         return formatter.stringFromDate(date)
     }
     
-    // MARK: Image Name
+    // MARK: Image
     
     class func imageNameFromDate(date: NSDate) -> String {
         let formatter = NSDateFormatter()
@@ -132,22 +223,26 @@ extension Meme {
         return formatter.stringFromDate(date)
     }
     
+    class func imagePathWithName(name: String) -> String {
+        let dirURL = try! NSFileManager.defaultManager().URLForDirectory(.DocumentDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: true)
+        return dirURL.URLByAppendingPathComponent(name).path!
+    }
+    
+    class func imageWithName(name: String) -> UIImage? {
+        let dirURL = try! NSFileManager.defaultManager().URLForDirectory(.DocumentDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: true)
+        let path = dirURL.URLByAppendingPathComponent(name).path!
+        
+        if NSFileManager.defaultManager().fileExistsAtPath(path) {
+            return UIImage(contentsOfFile: path)
+        } else {
+            return nil
+        }
+    }
+
 }
 
-// Meme Group
 
-enum MemeGroup: Int {
-    case Web = 0
-    case Mine
-}
 
-enum ReversedMemeGroup: Int {
-    case Mine = 0
-    case Web
-}
-
-let MemeGroups = ["Funny Memes From Web", "My Memes"]
-let ReversedMemeGroups = ["My Memes", "Funny Memes From Web"]
 
 
 

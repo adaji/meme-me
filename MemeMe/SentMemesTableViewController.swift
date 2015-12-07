@@ -7,16 +7,11 @@
 //
 
 import UIKit
+import CoreData
 
 // MARK: - SentMemesTableViewController: UITableViewController
 
-class SentMemesTableViewController: UITableViewController {
-    
-    // MARK: Properties
-    
-    // Display latest items at the top
-    private var memes: [Meme]!
-    private let localMemes: [Meme] = Meme.localMemes
+class SentMemesTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
     
     // MARK: Life Cycle
     
@@ -24,49 +19,82 @@ class SentMemesTableViewController: UITableViewController {
         super.viewDidLoad()
         
         tableView.userInteractionEnabled = true
+        
+        do {
+            try fetchedResultController.performFetch()
+        } catch {
+            print("Unresolved error: \(error)")
+            abort()
+        }
+        
+        fetchedResultController.delegate = self
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        memes = (UIApplication.sharedApplication().delegate as! AppDelegate).memes
-
-        // For better performance, only update view(s) for new meme(s)
-        let section = ReversedMemeGroup.Mine.rawValue
-        let rowsCount = tableView.numberOfRowsInSection(section)
-        if rowsCount < memes.count {
-            var indexPaths = [NSIndexPath]()
-            var row = 0
-            for _ in rowsCount...(memes.count - 1) {
-                indexPaths.append(NSIndexPath(forRow: row, inSection: section))
-                row++
-            }
-            tableView.insertRowsAtIndexPaths(indexPaths, withRowAnimation: .Automatic)
-            tableView.headerViewForSection(section)?.textLabel?.text = ReversedMemeGroups[section] + " (" + String(memesForGroup(section).count) + ")"
+        tableView.reloadData()
+    }
+    
+    // MARK: Core Data Convenience
+    
+    lazy var sharedContext: NSManagedObjectContext = {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }()
+    
+    func saveContext() {
+        CoreDataStackManager.sharedInstance().saveContext()
+    }
+    
+    lazy var fetchedResultController: NSFetchedResultsController = {
+        let fetchRequest = NSFetchRequest(entityName: "Meme")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: Meme.Keys.SentDate, ascending: true)]
+        return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
+    }()
+    
+    // MARK: NSFetchedResultsControllerDelegate
+    
+    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+        tableView.beginUpdates()
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+        
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        switch type {
+        case .Insert:
+            tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
+        case .Delete:
+            tableView.deleteRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
+        default:
+            return
         }
+    }
+    
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        tableView.endUpdates()
     }
     
     // MARK: UITableViewDataSource
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return ReversedMemeGroups.count
+        return 1
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return ReversedMemeGroups[section] + " (" + String(memesForGroup(section).count) + ")"
+        return "Sent Memes" + " (" + String(fetchedResultController.sections![section].numberOfObjects) + ")"
     }
-
+    
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return memesForGroup(section).count
+        return fetchedResultController.sections![section].numberOfObjects
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeTableViewCell")! as! MemeTableViewCell
-        let memes = memesForGroup(indexPath.section)
-        let meme = memes[memes.count - 1 - indexPath.row]
-        
+        let meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
         configureCell(cell, withMeme: meme)
-        
         return cell
     }
     
@@ -78,51 +106,32 @@ class SentMemesTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        
+        let memeDetailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
+        memeDetailVC.meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
+        
+        navigationController!.pushViewController(memeDetailVC, animated: true)
     }
     
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        switch indexPath.section {
-        case ReversedMemeGroup.Mine.rawValue:
-            return true
-        case ReversedMemeGroup.Web.rawValue:
-            return false
-        default:
-            assert(false, "Unexpected section")
-        }
+        return true
     }
     
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        let section = indexPath.section
-        switch section {
-        case ReversedMemeGroup.Mine.rawValue:
-            switch editingStyle {
-            case .Delete:
-                let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-                appDelegate.memes.removeAtIndex(memes.count - 1 - indexPath.row)
-                memes = appDelegate.memes
-                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-                tableView.headerViewForSection(section)?.textLabel?.text = ReversedMemeGroups[section] + " (" + String(memesForGroup(section).count) + ")"
-                
-                appDelegate.shouldReloadCollectionView = true
-                
-                break
-            default:
-                break
-            }
+        switch editingStyle {
+        case .Delete:
+            let meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
+            sharedContext.deleteObject(meme)
+            saveContext()
         default:
-            assert(false, "Unexpected section")
+            break
         }
     }
     
     // MARK: Configure UI
     
     func configureCell(cell: MemeTableViewCell, withMeme meme: Meme) {
-        print(meme.originalImagePath)
-        let fileManager = NSFileManager.defaultManager()
-        if fileManager.fileExistsAtPath(meme.originalImagePath) {
-            let originalImage = UIImage(contentsOfFile: meme.originalImagePath)
-            cell.memeImageView.image = originalImage
-        }
+        cell.memeImageView.image = Meme.imageWithName(meme.originalImageName)
         
         let attributes = Meme.previewTextAttributesForMeme(meme)
         cell.topLabel.attributedText = NSAttributedString(string: meme.topText, attributes: attributes)
@@ -133,36 +142,6 @@ class SentMemesTableViewController: UITableViewController {
         cell.memeTextLabel.lineBreakMode = .ByTruncatingMiddle
         
         cell.dateLabel.text = Meme.stringFromDate(meme.sentDate)
-    }
-    
-    // MARK: Navigation
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let identifier = segue.identifier {
-            switch identifier {
-            case "ShowMemeDetail":
-                if let detailVC = segue.destinationViewController as? MemeDetailViewController {
-                    let memes = memesForGroup(tableView.indexPathForSelectedRow!.section)
-                    detailVC.meme = memes[memes.count - 1 - tableView.indexPathForSelectedRow!.row]
-                }
-                return
-            default:
-                return
-            }
-        }
-    }
-    
-    // MARK: Helper Methods
-    
-    func memesForGroup(group: Int) -> [Meme] {
-        switch group {
-        case ReversedMemeGroup.Mine.rawValue:
-            return memes
-        case ReversedMemeGroup.Web.rawValue:
-            return localMemes
-        default:
-            assert(false, "Unknown date group type")
-        }
     }
     
 }
