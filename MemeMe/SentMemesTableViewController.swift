@@ -21,13 +21,13 @@ class SentMemesTableViewController: UITableViewController, NSFetchedResultsContr
         tableView.userInteractionEnabled = true
         
         do {
-            try fetchedResultController.performFetch()
+            try fetchedResultsController.performFetch()
         } catch {
             print("Unresolved error: \(error)")
             abort()
         }
         
-        fetchedResultController.delegate = self
+        fetchedResultsController.delegate = self
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -46,7 +46,7 @@ class SentMemesTableViewController: UITableViewController, NSFetchedResultsContr
         CoreDataStackManager.sharedInstance().saveContext()
     }
     
-    lazy var fetchedResultController: NSFetchedResultsController = {
+    lazy var fetchedResultsController: NSFetchedResultsController = {
         let fetchRequest = NSFetchRequest(entityName: "Meme")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: Meme.Keys.SentDate, ascending: true)]
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -84,16 +84,16 @@ class SentMemesTableViewController: UITableViewController, NSFetchedResultsContr
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Sent Memes" + " (" + String(fetchedResultController.sections![section].numberOfObjects) + ")"
+        return "Sent Memes" + " (" + String(fetchedResultsController.sections![section].numberOfObjects) + ")"
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return fetchedResultController.sections![section].numberOfObjects
+        return fetchedResultsController.sections![section].numberOfObjects
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MemeTableViewCell")! as! MemeTableViewCell
-        let meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
+        let meme = fetchedResultsController.objectAtIndexPath(indexPath) as! Meme
         configureCell(cell, withMeme: meme)
         return cell
     }
@@ -108,7 +108,7 @@ class SentMemesTableViewController: UITableViewController, NSFetchedResultsContr
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
         
         let memeDetailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        memeDetailVC.meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
+        memeDetailVC.meme = fetchedResultsController.objectAtIndexPath(indexPath) as! Meme
         
         navigationController!.pushViewController(memeDetailVC, animated: true)
     }
@@ -120,7 +120,7 @@ class SentMemesTableViewController: UITableViewController, NSFetchedResultsContr
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         switch editingStyle {
         case .Delete:
-            let meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
+            let meme = fetchedResultsController.objectAtIndexPath(indexPath) as! Meme
             sharedContext.deleteObject(meme)
             saveContext()
         default:

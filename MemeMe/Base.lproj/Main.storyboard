@@ -270,7 +270,6 @@
                                     <outlet property="memeImageView" destination="CcH-9B-jYD" id="GA7-6K-Iz1"/>
                                     <outlet property="memeTextLabel" destination="B46-Ju-Z3B" id="NsF-L7-GJP"/>
                                     <outlet property="topLabel" destination="cFj-XZ-rnd" id="xBx-WJ-NH0"/>
-                                    <segue destination="ETI-hv-NCQ" kind="show" identifier="ShowMemeDetail" id="nh8-1u-tzs"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -389,7 +388,6 @@
                                     <outlet property="bottomLabel" destination="p1b-99-nvd" id="Wlj-ud-Q1G"/>
                                     <outlet property="memeImageView" destination="qre-Sr-Vm6" id="KrK-4I-toY"/>
                                     <outlet property="topLabel" destination="lyT-Xb-m6H" id="pcg-RM-a4y"/>
-                                    <segue destination="ETI-hv-NCQ" kind="show" identifier="ShowMemeDetail" id="vSP-kk-gsk"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>
@@ -462,7 +460,6 @@
         <image name="list" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="nh8-1u-tzs"/>
         <segue reference="EbY-bh-Wil"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="1" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>

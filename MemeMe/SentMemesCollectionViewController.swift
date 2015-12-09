@@ -29,7 +29,7 @@ class SentMemesCollectionViewController: UICollectionViewController, NSFetchedRe
         flowLayout.itemSize = itemSize()
         
         do {
-            try fetchedResultController.performFetch()
+            try fetchedResultsController.performFetch()
         } catch {
             print("Unresolved error: \(error)")
             abort()
@@ -59,7 +59,7 @@ class SentMemesCollectionViewController: UICollectionViewController, NSFetchedRe
         CoreDataStackManager.sharedInstance().saveContext()
     }
     
-    lazy var fetchedResultController: NSFetchedResultsController = {
+    lazy var fetchedResultsController: NSFetchedResultsController = {
         let fetchRequest = NSFetchRequest(entityName: "Meme")
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: Meme.Keys.SentDate, ascending: true)]
         return NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.sharedContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -76,7 +76,7 @@ class SentMemesCollectionViewController: UICollectionViewController, NSFetchedRe
         switch kind {
         case UICollectionElementKindSectionHeader:
             let headerView = collectionView.dequeueReusableSupplementaryViewOfKind(kind, withReuseIdentifier: "MemeCollectionHeaderView", forIndexPath: indexPath) as! MemeCollectionHeaderView
-            headerView.titleLabel.text = "Sent Memes" + " (" + String(fetchedResultController.sections![indexPath.section].numberOfObjects) + ")"
+            headerView.titleLabel.text = "Sent Memes" + " (" + String(fetchedResultsController.sections![indexPath.section].numberOfObjects) + ")"
             
             return headerView
             
@@ -86,12 +86,12 @@ class SentMemesCollectionViewController: UICollectionViewController, NSFetchedRe
     }
     
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return fetchedResultController.sections![section].numberOfObjects
+        return fetchedResultsController.sections![section].numberOfObjects
     }
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MemeCollectionViewCell", forIndexPath: indexPath) as! MemeCollectionViewCell
-        let meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
+        let meme = fetchedResultsController.objectAtIndexPath(indexPath) as! Meme
         configureCell(cell, withMeme: meme)
         
         return cell
@@ -113,7 +113,7 @@ class SentMemesCollectionViewController: UICollectionViewController, NSFetchedRe
         collectionView.deselectItemAtIndexPath(indexPath, animated: true)
         
         let detailVC = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        detailVC.meme = fetchedResultController.objectAtIndexPath(indexPath) as! Meme
+        detailVC.meme = fetchedResultsController.objectAtIndexPath(indexPath) as! Meme
         navigationController!.pushViewController(detailVC, animated: true)
     }
     
