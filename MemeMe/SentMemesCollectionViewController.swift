@@ -56,6 +56,8 @@ class SentMemesCollectionViewController: UIViewController, UICollectionViewDataS
         super.viewWillAppear(animated)
                 
         collectionView!.reloadData()
+        
+        selectButton.enabled = fetchedResultsController.fetchedObjects?.count > 0
     }
     
     override func viewWillLayoutSubviews() {
@@ -277,7 +279,7 @@ class SentMemesCollectionViewController: UIViewController, UICollectionViewDataS
                 selected = true
             }
             
-            updateCell(cell, selected: selected)
+            cell.update(selected)
             
             updateBottomBar()
             
@@ -302,16 +304,6 @@ class SentMemesCollectionViewController: UIViewController, UICollectionViewDataS
         cell.topLabel.lineBreakMode = .ByTruncatingMiddle
         cell.bottomLabel.attributedText = NSAttributedString(string: meme.bottomText, attributes: attributes)
         cell.bottomLabel.lineBreakMode = .ByTruncatingMiddle
-    }
-    
-    // If a cell is selected, gray out its image
-    // Otherwise, display its original image
-    func updateCell(cell: MemeCollectionViewCell, selected: Bool) {
-        if selected {
-            cell.memeImageView.alpha = 0.5
-        } else {
-            cell.memeImageView.alpha = 1.0
-        }
     }
     
     // If there is at least one selected item, enable bottom bar buttons

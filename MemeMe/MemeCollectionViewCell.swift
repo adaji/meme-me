@@ -13,5 +13,13 @@ class MemeCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var memeImageView: UIImageView!
     @IBOutlet weak var topLabel: UILabel!
     @IBOutlet weak var bottomLabel: UILabel!
-        
+    
+    // If a cell is selected, gray out its image
+    // Otherwise, display its original image
+    func update(selected: Bool) {
+        for view in subviews {
+            view.alpha = selected ? 0.5 : 1.0
+        }
+    }
+
 }
