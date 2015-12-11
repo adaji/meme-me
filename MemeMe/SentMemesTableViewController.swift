@@ -67,7 +67,7 @@ class SentMemesTableViewController: UITableViewController, NSFetchedResultsContr
         case .Insert:
             tableView.insertRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
         case .Delete:
-            tableView.deleteRowsAtIndexPaths([newIndexPath!], withRowAnimation: .Fade)
+            tableView.deleteRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
         default:
             return
         }

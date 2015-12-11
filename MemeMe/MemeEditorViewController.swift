@@ -69,7 +69,7 @@ class MemeEditorViewController: KeyboardHandlingViewController, UIImagePickerCon
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
+                
         cameraButton.enabled = UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.Camera)
         
         addTextAttributesChangeRecognizers()
